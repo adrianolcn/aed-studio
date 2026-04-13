@@ -1,0 +1,92 @@
+# ════════════════════════════════════════════════════
+#  AED·Studio — .gitignore
+#  NUNCA remova as regras de segurança desta seção.
+# ════════════════════════════════════════════════════
+
+# ── Segurança — credenciais e configurações sensíveis ──────────
+# Bloqueia qualquer variante de .env com conteúdo real
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+
+# Bloqueia application-prod.properties para evitar vazamento
+# de credenciais de produção que possam ser escritas nele no futuro
+**/application-prod.properties
+**/application-production.properties
+
+# Bloqueia qualquer arquivo de keystore ou certificado
+*.jks
+*.p12
+*.pfx
+*.pem
+*.key
+*.crt
+
+# ── Java / Maven ───────────────────────────────────────────────
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+
+# ── IDE — IntelliJ IDEA ────────────────────────────────────────
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# ── IDE — VS Code ──────────────────────────────────────────────
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/*.code-workspace
+
+# ── IDE — Eclipse ──────────────────────────────────────────────
+.classpath
+.project
+.settings/
+bin/
+
+# ── IDE — NetBeans ─────────────────────────────────────────────
+nbproject/private/
+nbbuild/
+nbdist/
+nbactions.xml
+nb-configuration.xml
+
+# ── Sistema Operacional ────────────────────────────────────────
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+
+# ── Logs ───────────────────────────────────────────────────────
+*.log
+logs/
+spring.log
+
+# ── Temporários e cache ────────────────────────────────────────
+*.tmp
+*.temp
+*.swp
+*.swo
+.cache/

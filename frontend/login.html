@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AED·Studio — Entrar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg0: #0d1117; --bg1: #161b22; --bg2: #1e2530; --bg3: #252d3a;
+  --border: #30363d; --border2: #3d4651;
+  --text0: #e6edf3; --text1: #8b949e; --text2: #6e7681;
+  --accent: #58a6ff; --accent2: #388bfd;
+  --green: #3fb950; --amber: #d29922; --coral: #f78166;
+  --purple: #bc8cff; --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
+}
+
+html, body {
+  min-height: 100vh;
+  background: var(--bg0);
+  color: var(--text0);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Background grid ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(88,166,255,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(88,166,255,.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Layout ── */
+.page-wrap {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+/* ── Card ── */
+.card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 24px 64px rgba(0,0,0,.5);
+}
+
+/* ── Card header ── */
+.card-header {
+  padding: 28px 32px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+  text-align: center;
+}
+
+.logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 22px;
+  color: var(--accent);
+  letter-spacing: .08em;
+  margin-bottom: 6px;
+}
+
+.logo-sub {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+/* ── Tabs ── */
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .06em;
+  color: var(--text2);
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  transition: color .15s, background .15s;
+  text-transform: uppercase;
+}
+
+.auth-tab:hover { color: var(--text0); background: var(--bg2); }
+.auth-tab.active {
+  color: var(--accent);
+  border-bottom: 2px solid var(--accent);
+  background: var(--bg0);
+  margin-bottom: -1px;
+}
+
+/* ── Forms ── */
+.form-wrap {
+  padding: 28px 32px 32px;
+}
+
+.form-panel { display: none; }
+.form-panel.active { display: block; }
+
+.field { margin-bottom: 18px; }
+
+.field-label {
+  display: block;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+.field-input {
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--text0);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.field-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(88,166,255,.15);
+}
+
+.field-input::placeholder { color: var(--text2); }
+
+.field-input.error {
+  border-color: var(--coral);
+  box-shadow: 0 0 0 3px rgba(247,123,102,.15);
+}
+
+.field-error {
+  display: none;
+  font-size: 11px;
+  color: var(--coral);
+  margin-top: 5px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.field-error.visible { display: block; }
+
+/* Password toggle */
+.field-password-wrap { position: relative; }
+.password-toggle {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px;
+  line-height: 1;
+  transition: color .1s;
+}
+.password-toggle:hover { color: var(--text0); }
+
+/* Password strength */
+.pwd-strength { margin-top: 8px; }
+.pwd-bars { display: flex; gap: 4px; margin-bottom: 4px; }
+.pwd-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border);
+  transition: background .25s;
+}
+.pwd-bar.weak   { background: var(--coral); }
+.pwd-bar.medium { background: var(--amber); }
+.pwd-bar.strong { background: var(--green); }
+.pwd-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text2);
+}
+
+/* Submit button */
+.btn-submit {
+  width: 100%;
+  padding: 12px;
+  background: var(--accent2);
+  border: none;
+  border-radius: var(--r-sm);
+  color: #fff;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: .05em;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  margin-top: 8px;
+  position: relative;
+}
+
+.btn-submit:hover  { background: var(--accent); }
+.btn-submit:active { transform: scale(.99); }
+
+.btn-submit:disabled {
+  opacity: .5;
+  cursor: default;
+  transform: none;
+}
+
+/* Spinner inside button */
+.btn-submit.loading::after {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  margin-left: 8px;
+  vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Divider */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--text2);
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+}
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Auth mode toggle */
+.forgot-link {
+  display: block;
+  text-align: right;
+  font-size: 11px;
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent);
+  text-decoration: none;
+  margin-top: -10px;
+  margin-bottom: 18px;
+  opacity: .8;
+  transition: opacity .1s;
+}
+.forgot-link:hover { opacity: 1; }
+
+/* Alert banner */
+.alert {
+  display: none;
+  padding: 10px 14px;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+.alert.visible { display: block; }
+.alert.error {
+  background: rgba(247,123,102,.12);
+  border: 1px solid rgba(247,123,102,.3);
+  color: var(--coral);
+}
+.alert.success {
+  background: rgba(63,185,80,.12);
+  border: 1px solid rgba(63,185,80,.3);
+  color: var(--green);
+}
+
+/* Footer */
+.card-footer {
+  padding: 14px 32px;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: .05em;
+}
+
+.footer-badge span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+/* Terms note */
+.terms-note {
+  font-size: 11px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin-top: 14px;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .form-wrap { padding: 20px; }
+  .card-header { padding: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <div class="card">
+
+    <!-- Header -->
+    <div class="card-header">
+      <div class="logo">AED·Studio</div>
+      <div class="logo-sub">Algoritmos &amp; Estrutura de Dados</div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">
+        Entrar
+      </button>
+      <button class="auth-tab" id="tab-register" onclick="switchTab('register')">
+        Criar conta
+      </button>
+    </div>
+
+    <!-- Forms -->
+    <div class="form-wrap">
+
+      <!-- ── PAINEL LOGIN ── -->
+      <div class="form-panel active" id="panel-login">
+        <div class="alert" id="login-alert"></div>
+
+        <div class="field">
+          <label class="field-label" for="login-email">E-mail</label>
+          <input
+            class="field-input"
+            type="email"
+            id="login-email"
+            placeholder="seu@email.com"
+            autocomplete="email"
+            required
+          >
+          <div class="field-error" id="login-email-err">E-mail inválido</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="login-password">Senha</label>
+          <div class="field-password-wrap">
+            <input
+              class="field-input"
+              type="password"
+              id="login-password"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            >
+            <button class="password-toggle" type="button"
+                    onclick="togglePwd('login-password', this)"
+                    aria-label="Mostrar senha">👁</button>
+          </div>
+          <div class="field-error" id="login-pwd-err">Senha obrigatória</div>
+        </div>
+
+        <a href="#" class="forgot-link" onclick="showForgotAlert(event)">
+          Esqueceu a senha?
+        </a>
+
+        <button class="btn-submit" id="btn-login" onclick="handleLogin()">
+          Entrar
+        </button>
+      </div>
+
+      <!-- ── PAINEL REGISTRO ── -->
+      <div class="form-panel" id="panel-register">
+        <div class="alert" id="reg-alert"></div>
+
+        <div class="field">
+          <label class="field-label" for="reg-name">Nome completo</label>
+          <input
+            class="field-input"
+            type="text"
+            id="reg-name"
+            placeholder="Seu nome"
+            autocomplete="name"
+            required
+          >
+          <div class="field-error" id="reg-name-err">Nome obrigatório (mín. 2 caracteres)</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="reg-username">Username</label>
+          <input
+            class="field-input"
+            type="text"
+            id="reg-username"
+            placeholder="seunome123"
+            autocomplete="username"
+            required
+          >
+          <div class="field-error" id="reg-user-err">Use letras, números, _, . e -</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="reg-email">E-mail</label>
+          <input
+            class="field-input"
+            type="email"
+            id="reg-email"
+            placeholder="seu@email.com"
+            autocomplete="email"
+            required
+          >
+          <div class="field-error" id="reg-email-err">E-mail inválido</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label" for="reg-password">Senha</label>
+          <div class="field-password-wrap">
+            <input
+              class="field-input"
+              type="password"
+              id="reg-password"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              oninput="checkPwdStrength(this.value)"
+              required
+            >
+            <button class="password-toggle" type="button"
+                    onclick="togglePwd('reg-password', this)"
+                    aria-label="Mostrar senha">👁</button>
+          </div>
+          <div class="pwd-strength" id="pwd-strength" style="display:none">
+            <div class="pwd-bars">
+              <div class="pwd-bar" id="ps1"></div>
+              <div class="pwd-bar" id="ps2"></div>
+              <div class="pwd-bar" id="ps3"></div>
+              <div class="pwd-bar" id="ps4"></div>
+            </div>
+            <div class="pwd-label" id="ps-label"></div>
+          </div>
+          <div class="field-error" id="reg-pwd-err">
+            Mín. 8 caracteres, 1 maiúscula, 1 minúscula e 1 número
+          </div>
+        </div>
+
+        <button class="btn-submit" id="btn-register" onclick="handleRegister()">
+          Criar minha conta
+        </button>
+
+        <p class="terms-note">
+          Ao criar uma conta você concorda com os termos de uso da plataforma.
+        </p>
+      </div>
+    </div><!-- /form-wrap -->
+
+    <!-- Footer -->
+    <div class="card-footer">
+      <div class="footer-badge"><span></span>API online</div>
+      <div class="footer-badge" style="color:var(--text2)">v2.0 · JWT + Sessão</div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /page-wrap -->
+
+<script>
+/* ═══════════════════════════════════════════════
+   Configuração — aponte para o seu back-end
+═══════════════════════════════════════════════ */
+const API_BASE = 'http://localhost:8080';
+
+/* ═══════════════════════════════════════════════
+   Tabs
+═══════════════════════════════════════════════ */
+function switchTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.getElementById('panel-' + tab).classList.add('active');
+  clearAllErrors();
+}
+
+/* ═══════════════════════════════════════════════
+   Validação inline
+═══════════════════════════════════════════════ */
+function clearAllErrors() {
+  document.querySelectorAll('.field-error').forEach(e => e.classList.remove('visible'));
+  document.querySelectorAll('.field-input').forEach(i => i.classList.remove('error'));
+  document.querySelectorAll('.alert').forEach(a => {
+    a.classList.remove('visible', 'error', 'success');
+    a.textContent = '';
+  });
+}
+
+function showFieldError(inputId, errId) {
+  document.getElementById(inputId).classList.add('error');
+  document.getElementById(errId).classList.add('visible');
+}
+
+function clearFieldError(inputId, errId) {
+  document.getElementById(inputId).classList.remove('error');
+  document.getElementById(errId).classList.remove('visible');
+}
+
+function showAlert(alertId, msg, type = 'error') {
+  const el = document.getElementById(alertId);
+  el.textContent = msg;
+  el.className = 'alert visible ' + type;
+}
+
+/* ═══════════════════════════════════════════════
+   Password toggle
+═══════════════════════════════════════════════ */
+function togglePwd(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   Password strength meter
+═══════════════════════════════════════════════ */
+function checkPwdStrength(pwd) {
+  const wrap = document.getElementById('pwd-strength');
+  const bars = ['ps1','ps2','ps3','ps4'];
+  const label = document.getElementById('ps-label');
+
+  if (!pwd) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+
+  let score = 0;
+  if (pwd.length >= 8)              score++;
+  if (/[A-Z]/.test(pwd))            score++;
+  if (/[a-z]/.test(pwd))            score++;
+  if (/\d/.test(pwd))               score++;
+  if (/[^A-Za-z0-9]/.test(pwd))     score++;
+
+  const level = score <= 2 ? 'weak' : score <= 3 ? 'medium' : 'strong';
+  const labels = { weak: 'Fraca', medium: 'Média', strong: 'Forte' };
+  const colors = { weak: 'var(--coral)', medium: 'var(--amber)', strong: 'var(--green)' };
+
+  bars.forEach((id, i) => {
+    const bar = document.getElementById(id);
+    bar.className = 'pwd-bar';
+    if (i < score) bar.classList.add(level);
+  });
+
+  label.textContent = labels[level];
+  label.style.color = colors[level];
+}
+
+/* ═══════════════════════════════════════════════
+   Login (JWT via API)
+═══════════════════════════════════════════════ */
+async function handleLogin() {
+  clearAllErrors();
+
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  let valid = true;
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showFieldError('login-email', 'login-email-err');
+    valid = false;
+  }
+  if (!password) {
+    showFieldError('login-password', 'login-pwd-err');
+    valid = false;
+  }
+  if (!valid) return;
+
+  setLoading('btn-login', true);
+
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+      credentials: 'include',  // envia/recebe cookies de sessão
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showAlert('login-alert', data.message || 'E-mail ou senha inválidos');
+      return;
+    }
+
+    // Persiste tokens no sessionStorage (mais seguro que localStorage para JWTs)
+    sessionStorage.setItem('aed_access_token', data.accessToken);
+    sessionStorage.setItem('aed_refresh_token', data.refreshToken);
+    sessionStorage.setItem('aed_user', JSON.stringify(data.user));
+
+    showAlert('login-alert', '✓ Login realizado! Redirecionando...', 'success');
+
+    // Aguarda um momento para o usuário ver o feedback
+    setTimeout(() => {
+      window.location.href = 'aed-studio.html';
+    }, 700);
+
+  } catch (err) {
+    showAlert('login-alert', 'Erro de conexão. Verifique se o servidor está rodando.');
+    console.error('Login error:', err);
+  } finally {
+    setLoading('btn-login', false);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   Registro
+═══════════════════════════════════════════════ */
+async function handleRegister() {
+  clearAllErrors();
+
+  const fullName = document.getElementById('reg-name').value.trim();
+  const username = document.getElementById('reg-username').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  let valid = true;
+
+  if (fullName.length < 2) {
+    showFieldError('reg-name', 'reg-name-err'); valid = false;
+  }
+  if (!/^[a-zA-Z0-9_.-]{2,50}$/.test(username)) {
+    showFieldError('reg-username', 'reg-user-err'); valid = false;
+  }
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    showFieldError('reg-email', 'reg-email-err'); valid = false;
+  }
+  if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(password)) {
+    showFieldError('reg-password', 'reg-pwd-err'); valid = false;
+  }
+  if (!valid) return;
+
+  setLoading('btn-register', true);
+
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password, fullName }),
+      credentials: 'include',
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      showAlert('reg-alert', data.message || 'Erro ao criar conta. Tente novamente.');
+      return;
+    }
+
+    // Persiste tokens e redireciona
+    sessionStorage.setItem('aed_access_token', data.accessToken);
+    sessionStorage.setItem('aed_refresh_token', data.refreshToken);
+    sessionStorage.setItem('aed_user', JSON.stringify(data.user));
+
+    showAlert('reg-alert', `✓ Conta criada! Bem-vindo(a), ${data.user.fullName}!`, 'success');
+    setTimeout(() => { window.location.href = 'aed-studio.html'; }, 800);
+
+  } catch (err) {
+    showAlert('reg-alert', 'Erro de conexão. Verifique se o servidor está rodando.');
+    console.error('Register error:', err);
+  } finally {
+    setLoading('btn-register', false);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   Helpers
+═══════════════════════════════════════════════ */
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  btn.disabled = loading;
+  btn.classList.toggle('loading', loading);
+}
+
+function showForgotAlert(e) {
+  e.preventDefault();
+  showAlert('login-alert',
+    'Recuperação de senha não implementada nesta versão. ' +
+    'Contate o administrador.', 'error');
+}
+
+/* ═══════════════════════════════════════════════
+   Verificação de sessão existente
+   Se já estiver logado, redireciona diretamente
+═══════════════════════════════════════════════ */
+(function checkExistingSession() {
+  const token = sessionStorage.getItem('aed_access_token');
+  if (!token) return;
+
+  // Verifica se o token ainda é válido consultando /me
+  fetch(`${API_BASE}/api/auth/me`, {
+    headers: { 'Authorization': 'Bearer ' + token },
+    credentials: 'include',
+  })
+  .then(res => {
+    if (res.ok) {
+      window.location.href = 'aed-studio.html';
+    } else {
+      // Token expirado — limpa storage
+      sessionStorage.removeItem('aed_access_token');
+      sessionStorage.removeItem('aed_refresh_token');
+      sessionStorage.removeItem('aed_user');
+    }
+  })
+  .catch(() => { /* servidor offline — mostra tela normalmente */ });
+})();
+
+/* ═══════════════════════════════════════════════
+   Check API status
+═══════════════════════════════════════════════ */
+(function checkApiStatus() {
+  const badge = document.querySelector('.footer-badge');
+  fetch(`${API_BASE}/api/auth/me`, { signal: AbortSignal.timeout(3000) })
+    .catch(() => {
+      if (badge) {
+        badge.innerHTML = '<span style="background:var(--coral)"></span>API offline';
+      }
+    });
+})();
+
+/* Enter key submits active form */
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if (document.getElementById('panel-login').classList.contains('active')) {
+    handleLogin();
+  } else {
+    handleRegister();
+  }
+});
+</script>
+</body>
+</html>
