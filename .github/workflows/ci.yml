@@ -4,9 +4,17 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   backend:
-    runs-on: ubuntu-latest
+    name: backend / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
     defaults:
       run:
         working-directory: backend
@@ -17,5 +25,27 @@ jobs:
           distribution: temurin
           java-version: '17'
           cache: maven
-      - name: Test backend
+      - name: Prepare Maven wrapper on Unix
+        if: runner.os != 'Windows'
+        run: chmod +x mvnw
+      - name: Test backend on Unix
+        if: runner.os != 'Windows'
         run: ./mvnw test
+      - name: Test backend on Windows
+        if: runner.os == 'Windows'
+        run: .\mvnw.cmd test
+
+  frontend:
+    name: frontend / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Test frontend contracts
+        run: npm run test:frontend

@@ -389,6 +389,16 @@ Se Docker não estiver disponível, use temporariamente:
 CODE_SANDBOX_MODE=local
 ```
 
+### GitHub Actions falha em poucos segundos no job backend
+
+Quando o projeto é preparado no Windows, o arquivo `backend/mvnw` pode chegar ao GitHub sem permissão de execução. O workflow atual cobre isso e valida a aplicação nos três sistemas principais:
+
+- Linux: usa `backend/mvnw` após `chmod +x`.
+- macOS: usa `backend/mvnw` após `chmod +x`.
+- Windows: usa `backend/mvnw.cmd`.
+
+O CI também roda os testes de front-end em Linux, macOS e Windows. Se aparecer um erro antigo como `Permission denied` em `./mvnw test`, atualize o repositório com a versão mais recente de `.github/workflows/ci.yml`.
+
 ## 14. Checklist Antes de Subir Para o GitHub
 
 Não suba:
