@@ -171,4 +171,8 @@ public class User implements UserDetails {
     public String getDisplayName() {
         return (fullName != null && !fullName.isBlank()) ? fullName : username;
     }
+
+    public String getProfileUsername() {
+        return username;
+    }
 }

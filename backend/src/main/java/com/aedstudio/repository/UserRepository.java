@@ -19,11 +19,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     boolean existsByUsername(String username);
 
-    @Modifying
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("UPDATE User u SET u.xp = u.xp + :amount WHERE u.id = :userId")
     void addXp(Long userId, int amount);
 
-    @Modifying
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
     @Query("UPDATE User u SET u.topicsCompleted = u.topicsCompleted + 1 WHERE u.id = :userId")
     void incrementTopicsCompleted(Long userId);
 }

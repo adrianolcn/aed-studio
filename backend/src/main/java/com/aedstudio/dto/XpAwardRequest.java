@@ -16,6 +16,7 @@ public class XpAwardRequest {
     @NotBlank(message = "reason é obrigatório")
     private String reason;
 
+    @NotNull(message = "amount é obrigatório")
     @Min(value = 1, message = "XP deve ser positivo")
     @Max(value = 500, message = "XP por evento não pode exceder 500")
     private Integer amount;

@@ -81,7 +81,7 @@ class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("POST /register → 401 com e-mail duplicado")
+    @DisplayName("POST /register → 409 com e-mail duplicado")
     void register_duplicateEmail() throws Exception {
         RegisterRequest req = new RegisterRequest(USERNAME, EMAIL, PASSWORD, "Test User");
 
@@ -95,7 +95,7 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isConflict());
     }
 
     // ── Login JWT ────────────────────────────────────────────────────
@@ -166,6 +166,69 @@ class AuthControllerTest {
     @DisplayName("GET /me → 401 sem token")
     void me_unauthenticated() throws Exception {
         mockMvc.perform(get("/api/auth/me"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("GET /me → 401 com token inválido")
+    void me_invalidToken() throws Exception {
+        mockMvc.perform(get("/api/auth/me")
+                        .header("Authorization", "Bearer token-invalido"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("POST /refresh → rotaciona refresh token e rejeita o token antigo")
+    void refresh_rotatesToken() throws Exception {
+        RegisterRequest reg = new RegisterRequest(USERNAME, EMAIL, PASSWORD, "Test User");
+        MvcResult result = mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reg)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String firstRefresh = objectMapper.readTree(result.getResponse().getContentAsString())
+                .get("refreshToken").asText();
+
+        MvcResult refreshResult = mockMvc.perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"" + firstRefresh + "\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.refreshToken").isNotEmpty())
+                .andReturn();
+
+        String secondRefresh = objectMapper.readTree(refreshResult.getResponse().getContentAsString())
+                .get("refreshToken").asText();
+        org.assertj.core.api.Assertions.assertThat(secondRefresh).isNotEqualTo(firstRefresh);
+
+        mockMvc.perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"" + firstRefresh + "\"}"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("POST /logout → revoga refresh token do usuário")
+    void logout_revokesRefreshToken() throws Exception {
+        RegisterRequest reg = new RegisterRequest(USERNAME, EMAIL, PASSWORD, "Test User");
+        MvcResult result = mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reg)))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String body = result.getResponse().getContentAsString();
+        String accessToken = objectMapper.readTree(body).get("accessToken").asText();
+        String refreshToken = objectMapper.readTree(body).get("refreshToken").asText();
+
+        mockMvc.perform(post("/api/auth/logout")
+                        .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"refreshToken\":\"" + refreshToken + "\"}"))
                 .andExpect(status().isUnauthorized());
     }
 }

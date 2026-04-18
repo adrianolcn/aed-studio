@@ -7,6 +7,8 @@ package com.aedstudio.model;
  * COMPLETED → usuário respondeu pelo menos um quiz corretamente
  */
 public enum TopicState {
+    LOCKED,
+    AVAILABLE,
     VISITED,
     COMPLETED
 }

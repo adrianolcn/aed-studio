@@ -2,13 +2,18 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#161b22">
 <title>AED·Studio — Entrar</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── TEMA ESCURO (padrão) ── */
 :root {
   --bg0: #0d1117; --bg1: #161b22; --bg2: #1e2530; --bg3: #252d3a;
   --border: #30363d; --border2: #3d4651;
@@ -18,14 +23,57 @@
   --purple: #bc8cff; --r-sm: 8px; --r-md: 12px; --r-lg: 16px;
 }
 
+/* ── TEMA CLARO ── */
+[data-theme="light"] {
+  --bg0: #f6f8fa; --bg1: #ffffff; --bg2: #eaeef2; --bg3: #d0d7de;
+  --border: #d0d7de; --border2: #afc1d0;
+  --text0: #1f2328; --text1: #656d76; --text2: #8c959f;
+  --accent: #0969da; --accent2: #0860ca;
+  --green: #1a7f37; --amber: #9a6700; --coral: #cf222e;
+  --purple: #8250df;
+}
+
+/* ── SISTEMA ── */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]):not([data-theme="light"]) {
+    --bg0: #f6f8fa; --bg1: #ffffff; --bg2: #eaeef2; --bg3: #d0d7de;
+    --border: #d0d7de; --border2: #afc1d0;
+    --text0: #1f2328; --text1: #656d76; --text2: #8c959f;
+    --accent: #0969da; --accent2: #0860ca;
+    --green: #1a7f37; --amber: #9a6700; --coral: #cf222e;
+    --purple: #8250df;
+  }
+}
+
+/* ── Transição suave ── */
+*, *::before, *::after {
+  transition: background-color .25s ease, border-color .25s ease, color .18s ease;
+}
+.pwd-bar, .btn-submit { transition: background .25s, color .15s, transform .1s; }
+
+/* ── Seletor de tema flutuante (canto inferior direito do card) ── */
+.theme-toggle-row {
+  display: flex; justify-content: center; gap: 6px; padding: 10px 0 0;
+}
+.tt-btn {
+  font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+  padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border);
+  background: var(--bg2); color: var(--text2); cursor: pointer;
+  transition: border-color .15s, color .15s;
+}
+.tt-btn:hover  { border-color: var(--accent); color: var(--text0); }
+.tt-btn.active { border-color: var(--accent); color: var(--accent); background: var(--bg0); }
+
 html, body {
   min-height: 100vh;
+  width: 100%;
   background: var(--bg0);
   color: var(--text0);
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 14px;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
 }
 
 /* ── Background grid ── */
@@ -56,6 +104,7 @@ body::before {
 .card {
   width: 100%;
   max-width: 420px;
+  min-width: 0;
   background: var(--bg1);
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -96,6 +145,7 @@ body::before {
 
 .auth-tab {
   flex: 1;
+  min-width: 0;
   padding: 12px;
   text-align: center;
   font-family: 'IBM Plex Mono', monospace;
@@ -315,6 +365,8 @@ body::before {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
 }
 
 .footer-badge {
@@ -343,10 +395,89 @@ body::before {
   text-align: center;
 }
 
-/* Responsive */
+/* ── Responsividade ── */
+
+/* Em telas pequenas o card ocupa toda a viewport sem bordas arredondadas */
 @media (max-width: 480px) {
-  .form-wrap { padding: 20px; }
-  .card-header { padding: 20px; }
+  .page-wrap {
+    padding: 0;
+    align-items: flex-start;
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  .card {
+    max-width: 100%;
+    width: 100%;
+    min-width: 0;
+    border-radius: 0;
+    min-height: 100dvh;
+    border: none;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+  }
+  .card-header { padding: 24px 20px 18px; }
+  .form-wrap { padding: 20px 16px 28px; flex: 1; }
+  .auth-tabs,
+  .form-wrap,
+  .card-footer,
+  .theme-toggle-row {
+    width: 100%;
+    max-width: 100vw;
+    min-width: 0;
+  }
+  .card-footer {
+    justify-content: center;
+    padding: 10px 16px;
+  }
+  .footer-badge {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .theme-toggle-row { padding: 8px 0 16px; }
+  .tt-btn {
+    padding: 3px 8px;
+    font-size: 9px;
+  }
+  /* Campos com altura mínima de toque (44px) */
+  .field-input { min-height: 44px; font-size: 16px; } /* 16px previne zoom no iOS */
+  .btn-submit { min-height: 48px; font-size: 14px; }
+  .auth-tab {
+    flex: 1 1 0;
+    max-width: 50%;
+    padding: 14px 6px;
+    font-size: 10px;
+    line-height: 1.2;
+    min-height: 44px;
+    overflow-wrap: anywhere;
+  }
+  #tab-register {
+    text-align: left;
+    padding-left: 16px;
+  }
+  .forgot-link { padding: 8px 0; display: inline-block; }
+}
+
+/* Telas muito pequenas (ex: iPhone SE 375px) */
+@media (max-width: 375px) {
+  .logo { font-size: 18px; }
+  .logo-sub { font-size: 9px; }
+  .form-wrap { padding: 16px 14px 24px; }
+}
+
+/* Tablets em paisagem: card centralizado com largura máxima razoável */
+@media (min-width: 481px) and (max-width: 900px) {
+  .card { max-width: 480px; }
+}
+
+/* Altura muito curta (ex: teclado aberto no mobile) */
+@media (max-height: 600px) and (max-width: 768px) {
+  .card-header { padding: 12px 20px; }
+  .logo { font-size: 16px; }
+  .logo-sub { display: none; }
+  .field { margin-bottom: 12px; }
+  .form-wrap { padding: 14px 16px 16px; }
 }
 </style>
 </head>
@@ -503,18 +634,50 @@ body::before {
 
     <!-- Footer -->
     <div class="card-footer">
-      <div class="footer-badge"><span></span>API online</div>
-      <div class="footer-badge" style="color:var(--text2)">v2.0 · JWT + Sessão</div>
+      <div class="footer-badge"><span></span>Ambiente seguro</div>
+      <div class="footer-badge" style="color:var(--text2)">v2.0 · AED Studio</div>
+    </div>
+
+    <!-- Seletor de tema -->
+    <div class="theme-toggle-row">
+      <button class="tt-btn active" id="ltopt-dark"   onclick="setLoginTheme('dark')">🌙 Escuro</button>
+      <button class="tt-btn"        id="ltopt-light"  onclick="setLoginTheme('light')">☀️ Claro</button>
+      <button class="tt-btn"        id="ltopt-system" onclick="setLoginTheme('system')">💻 Sistema</button>
     </div>
 
   </div><!-- /card -->
 </div><!-- /page-wrap -->
 
+<script src="api.js"></script>
 <script>
 /* ═══════════════════════════════════════════════
-   Configuração — aponte para o seu back-end
+   THEME ENGINE — compartilha localStorage com aed-studio.html
+   Os dois arquivos usam a mesma chave 'aed-theme'.
 ═══════════════════════════════════════════════ */
-const API_BASE = 'http://localhost:8080';
+function applyLoginTheme(mode) {
+  const root = document.documentElement;
+  if (mode === 'dark')       root.setAttribute('data-theme', 'dark');
+  else if (mode === 'light') root.setAttribute('data-theme', 'light');
+  else                       root.removeAttribute('data-theme');
+
+  ['dark','light','system'].forEach(m => {
+    const btn = document.getElementById('ltopt-' + m);
+    if (btn) btn.classList.toggle('active', m === mode);
+  });
+}
+
+function setLoginTheme(mode) {
+  localStorage.setItem('aed-theme', mode);
+  applyLoginTheme(mode);
+}
+
+// Reage a mudanças do OS em tempo real
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+  if ((localStorage.getItem('aed-theme') || 'dark') === 'system') applyLoginTheme('system');
+});
+
+// Aplica imediatamente (antes do render)
+applyLoginTheme(localStorage.getItem('aed-theme') || 'dark');
 
 /* ═══════════════════════════════════════════════
    Tabs
@@ -624,24 +787,12 @@ async function handleLogin() {
   setLoading('btn-login', true);
 
   try {
-    const res = await fetch(`${API_BASE}/api/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-      credentials: 'include',  // envia/recebe cookies de sessão
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      showAlert('login-alert', data.message || 'E-mail ou senha inválidos');
+    const data = await AedApi.login(email, password);
+    if (!data) {
+      const err = AedApi.getLastError();
+      showAlert('login-alert', err?.message || 'E-mail ou senha inválidos');
       return;
     }
-
-    // Persiste tokens no sessionStorage (mais seguro que localStorage para JWTs)
-    sessionStorage.setItem('aed_access_token', data.accessToken);
-    sessionStorage.setItem('aed_refresh_token', data.refreshToken);
-    sessionStorage.setItem('aed_user', JSON.stringify(data.user));
 
     showAlert('login-alert', '✓ Login realizado! Redirecionando...', 'success');
 
@@ -687,24 +838,12 @@ async function handleRegister() {
   setLoading('btn-register', true);
 
   try {
-    const res = await fetch(`${API_BASE}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password, fullName }),
-      credentials: 'include',
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      showAlert('reg-alert', data.message || 'Erro ao criar conta. Tente novamente.');
+    const data = await AedApi.register(username, email, password, fullName);
+    if (!data) {
+      const err = AedApi.getLastError();
+      showAlert('reg-alert', err?.message || 'Erro ao criar conta. Tente novamente.');
       return;
     }
-
-    // Persiste tokens e redireciona
-    sessionStorage.setItem('aed_access_token', data.accessToken);
-    sessionStorage.setItem('aed_refresh_token', data.refreshToken);
-    sessionStorage.setItem('aed_user', JSON.stringify(data.user));
 
     showAlert('reg-alert', `✓ Conta criada! Bem-vindo(a), ${data.user.fullName}!`, 'success');
     setTimeout(() => { window.location.href = 'aed-studio.html'; }, 800);
@@ -737,40 +876,19 @@ function showForgotAlert(e) {
    Verificação de sessão existente
    Se já estiver logado, redireciona diretamente
 ═══════════════════════════════════════════════ */
-(function checkExistingSession() {
+(async function checkExistingSession() {
   const token = sessionStorage.getItem('aed_access_token');
   if (!token) return;
 
-  // Verifica se o token ainda é válido consultando /me
-  fetch(`${API_BASE}/api/auth/me`, {
-    headers: { 'Authorization': 'Bearer ' + token },
-    credentials: 'include',
-  })
-  .then(res => {
-    if (res.ok) {
-      window.location.href = 'aed-studio.html';
-    } else {
-      // Token expirado — limpa storage
-      sessionStorage.removeItem('aed_access_token');
-      sessionStorage.removeItem('aed_refresh_token');
-      sessionStorage.removeItem('aed_user');
-    }
-  })
-  .catch(() => { /* servidor offline — mostra tela normalmente */ });
+  const user = await AedApi.me({ redirectOnUnauthorized: false });
+  if (user) {
+    window.location.href = 'aed-studio.html';
+  } else if (AedApi.getLastError()?.status === 401) {
+    AedApi.clearSession();
+  }
 })();
 
-/* ═══════════════════════════════════════════════
-   Check API status
-═══════════════════════════════════════════════ */
-(function checkApiStatus() {
-  const badge = document.querySelector('.footer-badge');
-  fetch(`${API_BASE}/api/auth/me`, { signal: AbortSignal.timeout(3000) })
-    .catch(() => {
-      if (badge) {
-        badge.innerHTML = '<span style="background:var(--coral)"></span>API offline';
-      }
-    });
-})();
+/* Falhas de conexão são comunicadas nos formulários, não como status técnico permanente. */
 
 /* Enter key submits active form */
 document.addEventListener('keydown', e => {

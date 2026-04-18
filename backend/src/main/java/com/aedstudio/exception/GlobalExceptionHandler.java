@@ -3,6 +3,7 @@ package com.aedstudio.exception;
 import com.aedstudio.dto.ErrorResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -65,10 +66,24 @@ public class GlobalExceptionHandler {
 
     // ── 409 Conflict ────────────────────────────────────────────────
 
-    @ExceptionHandler(IllegalStateException.class)
+    @ExceptionHandler({DuplicateResourceException.class, DataIntegrityViolationException.class})
     public ResponseEntity<ErrorResponse> handleConflict(
-            IllegalStateException ex, HttpServletRequest request) {
+            RuntimeException ex, HttpServletRequest request) {
         return error(HttpStatus.CONFLICT, "Conflito", ex.getMessage(), request);
+    }
+
+    // ── 422 Unprocessable Entity ────────────────────────────────────
+
+    @ExceptionHandler(InvalidTopicException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTopic(
+            InvalidTopicException ex, HttpServletRequest request) {
+        return error(HttpStatus.UNPROCESSABLE_ENTITY, "Tópico inválido", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(LockedTopicException.class)
+    public ResponseEntity<ErrorResponse> handleLockedTopic(
+            LockedTopicException ex, HttpServletRequest request) {
+        return error(HttpStatus.LOCKED, "Tópico bloqueado", ex.getMessage(), request);
     }
 
     // ── 500 Internal Server Error ────────────────────────────────────

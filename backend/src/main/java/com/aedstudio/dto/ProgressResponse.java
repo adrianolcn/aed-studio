@@ -19,4 +19,9 @@ public class ProgressResponse {
     private LocalDate lastStudyDate;
     private Map<String, String> topics;
     private List<String> earnedEventKeys;
+    private LevelDto level;
+    private List<BadgeDto> badges;
+    private List<LearningTrackDto> tracks;
+    private Map<String, TopicStatusDto> topicStates;
+    private List<TopicStatusDto> nextRecommendedTopics;
 }

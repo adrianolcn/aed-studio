@@ -3,6 +3,7 @@ package com.aedstudio.controller;
 import com.aedstudio.dto.ProgressResponse;
 import com.aedstudio.dto.TopicVisitRequest;
 import com.aedstudio.dto.XpAwardRequest;
+import com.aedstudio.dto.XpAwardResponse;
 import com.aedstudio.model.User;
 import com.aedstudio.service.ProgressService;
 import jakarta.validation.Valid;
@@ -11,12 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
-
 /**
  * Controller de progresso do estudante.
  *
- * Todas as rotas requerem autenticação (JWT ou sessão).
+ * Todas as rotas requerem autenticação JWT.
  *
  *   GET  /api/progress          → estado completo de progresso
  *   POST /api/progress/visit    → registra visita a tópico
@@ -40,27 +39,24 @@ public class ProgressController {
     // ── POST /api/progress/visit ─────────────────────────────────────
 
     @PostMapping("/visit")
-    public ResponseEntity<Map<String, String>> visit(
+    public ResponseEntity<ProgressResponse> visit(
             @Valid @RequestBody TopicVisitRequest req,
             @AuthenticationPrincipal User user) {
-        progressService.recordVisit(user, req.getTopicId());
-        return ResponseEntity.ok(Map.of(
-                "topicId", req.getTopicId(),
-                "status", "visited"
-        ));
+        return ResponseEntity.ok(progressService.recordVisit(user, req.getTopicId()));
     }
 
     // ── POST /api/progress/xp ────────────────────────────────────────
 
     @PostMapping("/xp")
-    public ResponseEntity<Map<String, Object>> awardXp(
+    public ResponseEntity<XpAwardResponse> awardXp(
             @Valid @RequestBody XpAwardRequest req,
             @AuthenticationPrincipal User user) {
         int awarded = progressService.awardXp(user, req);
-        return ResponseEntity.ok(Map.of(
-                "awarded", awarded,
-                "eventKey", req.getReason(),
-                "alreadyEarned", awarded == 0
-        ));
+        return ResponseEntity.ok(XpAwardResponse.builder()
+                .awarded(awarded)
+                .eventKey(req.getReason())
+                .alreadyEarned(awarded == 0)
+                .progress(progressService.getProgress(user))
+                .build());
     }
 }

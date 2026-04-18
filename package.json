@@ -1,0 +1,9 @@
+{
+  "name": "aed-studio",
+  "version": "2.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test:frontend": "node frontend/tests/api.test.js && node frontend/tests/app-contract.test.js && node frontend/tests/visual-e2e.test.js"
+  }
+}

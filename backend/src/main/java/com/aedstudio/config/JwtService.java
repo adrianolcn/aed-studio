@@ -4,7 +4,9 @@ import com.aedstudio.model.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.env.Environment;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -28,11 +30,27 @@ import java.util.function.Function;
 @Component
 public class JwtService {
 
+    private static final String DEV_DEFAULT_SECRET = "dev-secret-min-32-chars-change-in-prod";
+
     @Value("${jwt.secret}")
     private String secretKey;
 
     @Value("${jwt.expiration-ms}")
     private long accessTokenExpirationMs;
+
+    private final Environment environment;
+
+    public JwtService(Environment environment) {
+        this.environment = environment;
+    }
+
+    @PostConstruct
+    void validateSecret() {
+        boolean prod = java.util.Arrays.asList(environment.getActiveProfiles()).contains("prod");
+        if (prod && (secretKey == null || secretKey.isBlank() || DEV_DEFAULT_SECRET.equals(secretKey))) {
+            throw new IllegalStateException("JWT_SECRET é obrigatório em produção.");
+        }
+    }
 
     // ── Token generation ────────────────────────────────────────────
 
@@ -43,7 +61,7 @@ public class JwtService {
     public String generateAccessToken(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("role", user.getRole().name());
-        extraClaims.put("username", user.getUsername());
+        extraClaims.put("username", user.getProfileUsername());
         extraClaims.put("fullName", user.getFullName());
         return buildToken(extraClaims, user.getEmail(), accessTokenExpirationMs);
     }
@@ -116,7 +134,6 @@ public class JwtService {
 
     private SecretKey getSigningKey() {
         // A chave precisa ter ao menos 256 bits para HS256.
-        // Se a chave configurada for menor, padding com Base64.
         byte[] keyBytes;
         try {
             keyBytes = Decoders.BASE64.decode(secretKey);
@@ -124,8 +141,12 @@ public class JwtService {
             // Fallback: usa os bytes diretos (para chaves em texto plano no dev)
             keyBytes = secretKey.getBytes();
         }
-        // Garante 256 bits mínimo
+
         if (keyBytes.length < 32) {
+            boolean prod = java.util.Arrays.asList(environment.getActiveProfiles()).contains("prod");
+            if (prod) {
+                throw new IllegalStateException("JWT_SECRET precisa ter ao menos 256 bits em produção.");
+            }
             byte[] padded = new byte[32];
             System.arraycopy(keyBytes, 0, padded, 0, keyBytes.length);
             keyBytes = padded;

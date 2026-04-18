@@ -1,21 +1,17 @@
 # AED·Studio
 
 > Plataforma educacional de Algoritmos e Estrutura de Dados com autenticação completa.
-> Back-end em Spring Boot 3.2 · Java 17 · PostgreSQL · Flyway · JWT + Sessão.
+> Back-end em Spring Boot 3.2 · Java 17 · PostgreSQL · Flyway · JWT.
 
 ---
 
-## Screenshots
+## Estado atual
 
-| Tela de Login | Plataforma |
-|---|---|
-| ![Login](docs/login.png) | ![Plataforma](docs/platform.png) |
-
-| Progresso do aluno | Simulador de estruturas |
-|---|---|
-| ![Progresso](docs/progress.png) | ![Simulador](docs/simulator.png) |
-
-> **Para adicionar as imagens:** coloque os arquivos `.png` na pasta `docs/` e os badges acima serão renderizados automaticamente no GitHub.
+- Front-end estático em `frontend/login.html` e `frontend/aed-studio.html`.
+- API JWT para cadastro, login, refresh, logout e experiência educacional persistida.
+- Catálogo com trilhas, pré-requisitos, progresso por tópico/trilha, exercícios, simuladores, recomendações e analytics.
+- Health check público em `GET /api/health` e Swagger/OpenAPI em `/swagger-ui/index.html` e `/v3/api-docs`.
+- Testes de back-end com Maven e testes de contrato do front-end com Node.
 
 ---
 
@@ -29,13 +25,20 @@ aed-studio/
 │   │   ├── config/
 │   │   │   ├── JwtService.java          ← geração e validação de tokens
 │   │   │   ├── JwtAuthFilter.java       ← filtro JWT por requisição
-│   │   │   └── SecurityConfig.java      ← duas cadeias: JWT + sessão
+│   │   │   └── SecurityConfig.java      ← API JWT + frontend estatico
 │   │   ├── controller/
 │   │   │   ├── AuthController.java      ← /api/auth/*
-│   │   │   └── ProgressController.java  ← /api/progress/*
+│   │   │   ├── ProgressController.java  ← /api/progress/*
+│   │   │   ├── LearningController.java  ← exercícios fixos e dinâmicos
+│   │   │   ├── SimulationController.java← eventos dos simuladores
+│   │   │   ├── RecommendationController.java
+│   │   │   └── AnalyticsController.java
 │   │   ├── service/
 │   │   │   ├── AuthService.java         ← register, login, refresh, logout
-│   │   │   ├── ProgressService.java     ← visitas, XP, progresso
+│   │   │   ├── ProgressService.java     ← visitas, XP, progresso, exercícios, simulações
+│   │   │   ├── RecommendationService.java
+│   │   │   ├── AnalyticsService.java
+│   │   │   ├── TopicCatalog.java        ← lista canonica de topicos
 │   │   │   └── UserDetailsServiceImpl.java
 │   │   ├── model/
 │   │   │   ├── User.java                ← entidade principal (implements UserDetails)
@@ -43,20 +46,24 @@ aed-studio/
 │   │   │   ├── RefreshToken.java        ← JWT rotation
 │   │   │   ├── TopicProgress.java       ← progresso por tópico
 │   │   │   ├── TopicState.java
-│   │   │   └── XpEvent.java             ← idempotência de XP
+│   │   │   ├── XpEvent.java             ← idempotência de XP
+│   │   │   ├── ExerciseAttempt.java     ← tentativas persistidas
+│   │   │   ├── GeneratedExercise.java   ← exercícios gerados entregues
+│   │   │   ├── SimulationEvent.java     ← interação educacional nos simuladores
+│   │   │   └── UserBadge.java
 │   │   ├── dto/                         ← Request/Response objects
 │   │   ├── repository/                  ← JPA interfaces
 │   │   └── exception/                   ← handlers de erro padronizados
 │   ├── src/main/resources/
 │   │   ├── application.properties
 │   │   ├── application-dev.properties
-│   │   └── db/migration/                ← Flyway SQL (V1–V4)
+│   │   └── db/migration/                ← Flyway SQL (V1–V6)
 │   └── pom.xml
 ├── frontend/
 │   ├── login.html                       ← tela de autenticação
 │   ├── api.js                           ← cliente HTTP com refresh automático
-│   └── aed-studio.html                  ← plataforma principal
-├── docs/                                ← screenshots (não versionados os binários)
+│   └── aed-studio.html                  ← plataforma principal e experiência interativa
+├── .github/workflows/ci.yml             ← testes automatizados
 ├── .env.example                         ← template de variáveis de ambiente
 ├── .gitignore
 ├── LICENSE
@@ -66,6 +73,8 @@ aed-studio/
 ---
 
 ## Pré-requisitos
+
+Para um passo a passo completo de execução local, mobile, testes e sandbox de código, consulte [`MANUAL_EXECUCAO.md`](MANUAL_EXECUCAO.md).
 
 | Ferramenta | Versão mínima | Download |
 |---|---|---|
@@ -120,7 +129,9 @@ DATABASE_URL=jdbc:postgresql://localhost:5432/aedstudio
 DATABASE_USER=aedstudio
 DATABASE_PASSWORD=troque_esta_senha          # mesma do passo 2
 
-JWT_SECRET=gere_uma_chave_com_64_caracteres  # veja nota abaixo
+JWT_SECRET=gere_uma_chave_com_64_bytes_em_base64  # veja nota abaixo
+JWT_EXPIRATION_MS=3600000                         # 1 hora
+JWT_REFRESH_MS=604800000                         # 7 dias
 ```
 
 **Como gerar um JWT_SECRET seguro:**
@@ -191,8 +202,8 @@ http://localhost:8080
 Acesse no navegador ou via curl:
 
 ```bash
-# Deve retornar 401 (servidor rodando, rota protegida)
-curl -i http://localhost:8080/api/auth/me
+# Deve retornar UP
+curl -i http://localhost:8080/api/health
 ```
 
 ---
@@ -219,6 +230,11 @@ cd backend
 mvnw.cmd test
 ```
 
+**Front-end**
+```bash
+npm run test:frontend
+```
+
 ---
 
 ## API Reference
@@ -229,10 +245,8 @@ mvnw.cmd test
 |---|---|---|---|
 | `POST` | `/register` | ✗ | Cadastro + retorna tokens JWT |
 | `POST` | `/login` | ✗ | Login JWT (API / SPA) |
-| `POST` | `/login-web` | ✗ | Login sessão (front-end web) |
 | `POST` | `/refresh` | ✗ | Renova access token via refresh token |
 | `POST` | `/logout` | ✓ JWT | Revoga refresh token |
-| `POST` | `/logout-web` | ✓ Sessão | Invalida sessão HTTP |
 | `GET` | `/me` | ✓ | Dados do usuário autenticado |
 
 ### Progresso — `/api/progress`
@@ -242,6 +256,52 @@ mvnw.cmd test
 | `GET` | `/` | ✓ | Estado completo de progresso |
 | `POST` | `/visit` | ✓ | Registra visita a tópico |
 | `POST` | `/xp` | ✓ | Concede XP (idempotente) |
+
+### Catálogo — `/api/catalog`
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `GET` | `/topics` | ✗ | Lista trilhas, tópicos, pré-requisitos e total oficial |
+
+### Aprendizagem — `/api/learning`
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `GET` | `/topics/{topicId}/exercises` | ✓ | Exercícios obrigatórios do tópico |
+| `POST` | `/attempts` | ✓ | Corrige exercício obrigatório e atualiza progresso |
+| `POST` | `/generated-exercises` | ✓ | Gera e persiste nova variação de exercício |
+| `GET` | `/generated-exercises/history` | ✓ | Histórico dos exercícios gerados entregues ao aluno |
+| `POST` | `/generated-exercises/{id}/attempts` | ✓ | Corrige exercício gerado usando a versão persistida |
+
+### Código — `/api/code`
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `GET` | `/topics/{topicId}/challenges` | ✓ | Lista desafios de código seguros do tópico |
+| `POST` | `/run` | ✓ | Compila e executa o corpo da solução em sandbox com timeout e política restritiva |
+
+### Simuladores — `/api/simulations`
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `POST` | `/events` | ✓ | Registra interação relevante do simulador e concede XP idempotente quando aplicável |
+| `GET` | `/topics/{topicId}/missions` | ✓ | Lista missões guiadas e critérios formais do simulador |
+| `POST` | `/missions/{missionId}/submit` | ✓ | Valida estado do simulador e concede XP idempotente pela missão |
+
+### Recomendações — `/api/recommendations`
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `GET` | `/` | ✓ | Retorna recomendação principal, próximos passos, revisões e foco de trilha |
+
+### Analytics — `/api/analytics`
+
+| Método | Rota | Auth | Descrição |
+|---|---|---|---|
+| `GET` | `/overview` | ✓ | Visão geral de acerto, tentativas, simulações, XP e pontos de atenção |
+| `GET` | `/topics` | ✓ | Métricas por tópico, com insight derivado dos dados |
+| `GET` | `/trails` | ✓ | Métricas por trilha |
+| `GET` | `/xp-history` | ✓ | Série temporal diária de XP e acumulado |
 
 ### Exemplos
 
@@ -262,7 +322,7 @@ Content-Type: application/json
   "tokenType": "Bearer",
   "accessToken": "eyJhbGci...",
   "refreshToken": "550e8400-e29b-41d4-a716-446655440000",
-  "expiresIn": 86400,
+  "expiresIn": 3600,
   "user": {
     "id": 1,
     "username": "aluno",
@@ -282,33 +342,24 @@ Authorization: Bearer eyJhbGci...
 Content-Type: application/json
 
 {
-  "topicId": "tad",
-  "reason": "quiz_tad-q1",
+  "topicId": "arrays",
+  "reason": "quiz_arrays-q1",
   "amount": 10
 }
 ```
 
 ---
 
-## Fluxo de autenticação dual
+## Fluxo de autenticação
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  MODO 1 — JWT (para API e SPA)                                  │
+│  JWT (para API e SPA estatica)                                  │
 │                                                                  │
 │  1. POST /api/auth/login → { accessToken, refreshToken }        │
 │  2. Cada request: Authorization: Bearer <accessToken>           │
 │  3. accessToken expira → POST /api/auth/refresh → novo par      │
 │  4. Logout: POST /api/auth/logout (revoga refreshToken no DB)   │
-└─────────────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────────────┐
-│  MODO 2 — Sessão HTTP (para front-end web)                      │
-│                                                                  │
-│  1. POST /api/auth/login-web → cookie JSESSIONID                │
-│  2. Navegador envia o cookie automaticamente em cada request    │
-│  3. Sessão persistida no PostgreSQL (spring_session tables)     │
-│  4. Logout: POST /api/auth/logout-web (invalida sessão)         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -332,14 +383,68 @@ const user = await AedApi.requireAuth();
 AedApi.recordVisit('arrays');
 
 // Ao acertar um quiz:
-AedApi.awardXp('tad', 'quiz_tad-q1', 10);
+AedApi.awardXp('arrays', 'quiz_arrays-q1', 10);
 
 // Sincronizar progresso ao carregar:
 const progress = await AedApi.getProgress();
-// progress.topics     → { "arrays": "VISITED", "tad": "COMPLETED", ... }
+// progress.topics     → { "arrays": "VISITED", "graphs": "COMPLETED", ... }
 // progress.totalXp    → total de XP acumulado
 // progress.streakDays → sequência de dias estudados
+
+// Recomendação e analytics:
+const recommendations = await AedApi.getRecommendations();
+const analytics = await AedApi.getAnalyticsOverview();
+
+// Simuladores e exercícios dinâmicos:
+await AedApi.recordSimulationEvent('arrays', 'ARRAY', 'insert', 'FIRST_RUN', '[3]');
+const missions = await AedApi.getSimulatorMissions('arrays');
+await AedApi.submitSimulatorMission(missions[0].id, '{"values":[3,6,9],"edges":[]}');
+const generated = await AedApi.generateExercise('arrays', 1);
+await AedApi.submitGeneratedExercise(generated.id, 'A', 18);
+
+const challenges = await AedApi.getCodeChallenges('arrays');
+await AedApi.runCode(challenges[0].id, 'int total = 0; for (int value : values) total += value; return total;');
 ```
+
+---
+
+## Sandbox de Código em Produção
+
+O AED·Studio possui dois modos de execução para desafios de código:
+
+| Modo | Uso recomendado | Como funciona |
+|---|---|---|
+| `local` | Desenvolvimento e testes automatizados | Compila e executa em processo local com timeout e bloqueio de APIs perigosas |
+| `docker` | Produção e qualquer uso público | Executa cada submissão em container efêmero, sem rede, com filesystem de entrada somente leitura, `tmpfs`, limite de CPU, memória e PIDs |
+
+Para ativar o modo recomendado em produção:
+
+```dotenv
+CODE_SANDBOX_MODE=docker
+CODE_SANDBOX_TIMEOUT_SECONDS=2
+CODE_SANDBOX_DOCKER_IMAGE=eclipse-temurin:17-jdk
+CODE_SANDBOX_DOCKER_CPUS=0.5
+CODE_SANDBOX_DOCKER_MEMORY=128m
+CODE_SANDBOX_DOCKER_PIDS_LIMIT=64
+```
+
+Pré-requisitos:
+
+```bash
+docker pull eclipse-temurin:17-jdk
+docker run --rm --network none eclipse-temurin:17-jdk java -version
+```
+
+O comando gerado pelo back-end usa:
+
+- `--network none`
+- `--read-only`
+- `--tmpfs /tmp:rw,noexec,nosuid,size=64m`
+- `--security-opt no-new-privileges`
+- `--cpus`, `--memory` e `--pids-limit`
+- montagem do workspace como `/workspace:ro`
+
+Isso reduz bastante o risco de execução de código de aluno em ambiente compartilhado. Para escala pública maior, o próximo passo natural é mover o executor para workers dedicados, com fila, observabilidade e política de limpeza/agendamento.
 
 ---
 
@@ -350,7 +455,8 @@ const progress = await AedApi.getProgress();
 | **BCrypt custo 12** | ~300ms por hash — equilibra segurança e performance |
 | **Refresh token rotation** | Cada renovação invalida o token anterior, impedindo roubo silencioso |
 | **XP idempotente** | `UNIQUE(user_id, event_key)` no banco impede double-award mesmo com retry |
-| **Sessões no PostgreSQL** | Sobrevive a restarts do servidor; não depende de memória |
+| **JWT_SECRET obrigatório em produção** | O perfil `prod` falha ao iniciar sem segredo explícito |
+| **Access token de curta duração** | Padrão de 1 hora, configurável por `JWT_EXPIRATION_MS` |
 | **JWT sem dados sensíveis** | Payload contém apenas email e role — nunca senha ou PII |
 | **CORS restrito** | Apenas origens explícitas em `cors.allowed-origins` são aceitas |
 | **`.env` fora do repositório** | Credenciais nunca chegam ao git (ver seção abaixo) |

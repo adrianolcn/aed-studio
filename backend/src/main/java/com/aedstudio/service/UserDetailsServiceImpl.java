@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * Usado pelos dois mecanismos de autenticação:
  *  - JwtAuthFilter (API stateless — Authorization: Bearer)
- *  - UsernamePasswordAuthenticationFilter (sessão web — form login)
  *
  * O "username" aqui é sempre o e-mail.
  */

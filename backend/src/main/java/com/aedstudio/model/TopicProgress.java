@@ -67,6 +67,10 @@ public class TopicProgress {
         }
     }
 
+    public void addXp(int amount) {
+        this.xpEarned = this.xpEarned + amount;
+    }
+
     public boolean isCompleted() {
         return state == TopicState.COMPLETED;
     }

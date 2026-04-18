@@ -15,6 +15,8 @@ public interface XpEventRepository extends JpaRepository<XpEvent, Long> {
 
     List<XpEvent> findByUser(User user);
 
+    List<XpEvent> findByUserOrderByEarnedAtAsc(User user);
+
     @Query("SELECT xe.eventKey FROM XpEvent xe WHERE xe.user = :user")
     List<String> findEventKeysByUser(User user);
 }

@@ -9,25 +9,12 @@
 @echo off
 setlocal
 
-@REM Verifica se Java está disponível
-if not "%JAVA_HOME%"=="" goto OkJHome
-for %%i in (java.exe) do set "JAVACMD=%%~$PATH:i"
-if not "%JAVACMD%"=="" goto OkJava
-echo ERRO: variavel JAVA_HOME nao esta definida e 'java' nao foi encontrado no PATH.
-echo Instale o Java 17+ e tente novamente.
-exit /b 1
-:OkJHome
-set "JAVACMD=%JAVA_HOME%\bin\java.exe"
-if not exist "%JAVACMD%" (
-  echo ERRO: JAVA_HOME='%JAVA_HOME%', mas %JAVACMD% nao foi encontrado.
-  exit /b 1
-)
-:OkJava
-
 set MAVEN_PROJECTBASEDIR=%~dp0
+set MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR:~0,-1%
 
-set WRAPPER_JAR=%MAVEN_PROJECTBASEDIR%.mvn\wrapper\maven-wrapper.jar
-set WRAPPER_PROPERTIES=%MAVEN_PROJECTBASEDIR%.mvn\wrapper\maven-wrapper.properties
+set WRAPPER_JAR=%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar
+set WRAPPER_PROPERTIES=%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.properties
+set "WRAPPER_URL=https://repo.maven.apache.org/maven2/org/apache/maven/wrapper/maven-wrapper/3.2.0/maven-wrapper-3.2.0.jar"
 
 @REM Baixa o wrapper jar se não existir
 if not exist "%WRAPPER_JAR%" (
@@ -40,9 +27,6 @@ if not exist "%WRAPPER_JAR%" (
   )
 )
 
-"%JAVACMD%" ^
-  -classpath "%WRAPPER_JAR%" ^
-  "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
-  org.apache.maven.wrapper.MavenWrapperMain %*
+java -classpath "%WRAPPER_JAR%" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" org.apache.maven.wrapper.MavenWrapperMain %*
 
 if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
