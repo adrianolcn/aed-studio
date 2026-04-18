@@ -399,6 +399,13 @@ Quando o projeto é preparado no Windows, o arquivo `backend/mvnw` pode chegar a
 
 O CI também roda os testes de front-end em Linux, macOS e Windows. Se aparecer um erro antigo como `Permission denied` em `./mvnw test`, atualize o repositório com a versão mais recente de `.github/workflows/ci.yml`.
 
+Os testes de contrato do front-end são obrigatórios nos três sistemas. O smoke visual com navegador é separado porque depende do Chrome headless disponível no runner; no GitHub Actions ele roda apenas no Linux. Em ambiente local, use:
+
+```powershell
+npm run test:frontend:contracts
+npm run test:frontend:visual
+```
+
 ## 14. Checklist Antes de Subir Para o GitHub
 
 Não suba:

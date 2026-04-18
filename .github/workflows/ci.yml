@@ -48,4 +48,7 @@ jobs:
         with:
           node-version: '20'
       - name: Test frontend contracts
-        run: npm run test:frontend
+        run: npm run test:frontend:contracts
+      - name: Visual smoke test
+        if: runner.os == 'Linux'
+        run: npm run test:frontend:visual

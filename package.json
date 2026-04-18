@@ -4,6 +4,8 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "test:frontend": "node frontend/tests/api.test.js && node frontend/tests/app-contract.test.js && node frontend/tests/visual-e2e.test.js"
+    "test:frontend": "npm run test:frontend:contracts && npm run test:frontend:visual",
+    "test:frontend:contracts": "node frontend/tests/api.test.js && node frontend/tests/app-contract.test.js",
+    "test:frontend:visual": "node frontend/tests/visual-e2e.test.js"
   }
 }
