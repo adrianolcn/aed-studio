@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="680" viewBox="0 0 920 680" role="img" aria-labelledby="title desc">
+  <title id="title">Placeholder da tela de criação de conta</title>
+  <desc id="desc">Substitua este arquivo por um screenshot real da tela de criação de conta.</desc>
+  <rect width="920" height="680" fill="#090d14"/>
+  <rect x="74" y="54" width="772" height="572" rx="22" fill="#141b26" stroke="#2b3442"/>
+  <text x="460" y="150" text-anchor="middle" font-family="monospace" font-size="44" font-weight="700" fill="#5da8ff">AED·Studio</text>
+  <text x="460" y="195" text-anchor="middle" font-family="monospace" font-size="16" letter-spacing="5" fill="#8b95a5">ALGORITMOS &amp; ESTRUTURA DE DADOS</text>
+  <line x1="74" x2="846" y1="245" y2="245" stroke="#2b3442"/>
+  <rect x="460" y="245" width="386" height="70" fill="#101720"/>
+  <line x1="460" x2="846" y1="315" y2="315" stroke="#5da8ff" stroke-width="3"/>
+  <text x="653" y="290" text-anchor="middle" font-family="monospace" font-size="18" fill="#8fc7ff">CRIAR CONTA</text>
+  <text x="210" y="290" text-anchor="middle" font-family="monospace" font-size="18" fill="#7b8494">ENTRAR</text>
+  <text x="150" y="390" font-family="monospace" font-size="18" fill="#7b8494">NOME COMPLETO</text>
+  <rect x="150" y="410" width="620" height="54" rx="8" fill="#1b2430" stroke="#3a4656"/>
+  <text x="174" y="444" font-family="monospace" font-size="18" fill="#7f8896">Seu nome</text>
+  <text x="150" y="510" font-family="monospace" font-size="18" fill="#7b8494">E-MAIL</text>
+  <rect x="150" y="530" width="620" height="54" rx="8" fill="#1b2430" stroke="#3a4656"/>
+  <text x="174" y="564" font-family="monospace" font-size="18" fill="#7f8896">seu@email.com</text>
+  <text x="460" y="638" text-anchor="middle" font-family="monospace" font-size="15" fill="#8b95a5">Substituir por screenshot real: docs/assets/aed-studio-create-account.png</text>
+</svg>
