@@ -101,3 +101,8 @@ test-results/
 dist/
 _verify*.png
 .chrome-profile*/
+
+# Assets descartados da galeria antiga do README
+docs/assets/aed-studio-login.png
+docs/assets/aed-studio-create-account.svg
+docs/assets/aed-studio-dashboard.svg

@@ -2,7 +2,7 @@
 
 > Plataforma educacional full-stack para aprender Algoritmos e Estruturas de Dados com trilhas, progresso persistido, simuladores interativos, exercícios dinâmicos, judge de código, recomendações e analytics.
 
-![AED Studio login preview](docs/assets/aed-studio-login.png)
+![Tela inicial desktop do AED Studio](docs/assets/aed-studio-platform-desktop.svg)
 
 ![Java](https://img.shields.io/badge/Java-17-2f8cff?style=for-the-badge)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-39b54a?style=for-the-badge)
@@ -42,36 +42,6 @@ O projeto foi pensado como MVP sério: o back-end é a fonte de verdade para aut
 - [Segurança](SECURITY.md)
 - [Changelog](CHANGELOG.md)
 - [Notas da atualização](GITHUB_RELEASE_NOTES.md)
-
-## Galeria da Plataforma
-
-<table>
-  <tr>
-    <td width="33%" align="center">
-      <img src="docs/assets/aed-studio-login.png" alt="Tela de login do AED Studio" width="100%">
-      <br>
-      <strong>Tela de login</strong>
-      <br>
-      <sub>Entrada do aluno com tema escuro/claro/sistema e autenticação JWT.</sub>
-    </td>
-    <td width="33%" align="center">
-      <img src="docs/assets/aed-studio-create-account.svg" alt="Tela de criação de conta do AED Studio" width="100%">
-      <br>
-      <strong>Tela de criação de conta</strong>
-      <br>
-      <sub>Cadastro do aluno para iniciar a jornada educacional.</sub>
-    </td>
-    <td width="33%" align="center">
-      <img src="docs/assets/aed-studio-dashboard.svg" alt="Tela inicial da plataforma AED Studio" width="100%">
-      <br>
-      <strong>Tela inicial da plataforma</strong>
-      <br>
-      <sub>Dashboard com mapa de progresso, XP, streak e próxima expedição.</sub>
-    </td>
-  </tr>
-</table>
-
----
 
 ## Estado atual
 
