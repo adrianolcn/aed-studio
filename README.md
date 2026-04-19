@@ -2,7 +2,7 @@
 
 > Plataforma educacional full-stack para aprender Algoritmos e Estruturas de Dados com trilhas, progresso persistido, simuladores interativos, exercícios dinâmicos, judge de código, recomendações e analytics.
 
-![Tela inicial desktop do AED Studio](docs/assets/aed-studio-platform-desktop.svg)
+![Tela inicial desktop do AED Studio](docs/assets/aed-studio-platform-desktop.png)
 
 ![Java](https://img.shields.io/badge/Java-17-2f8cff?style=for-the-badge)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-39b54a?style=for-the-badge)
