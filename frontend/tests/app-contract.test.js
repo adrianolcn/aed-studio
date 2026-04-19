@@ -33,6 +33,18 @@ test('dashboard educacional e exercícios são renderizados a partir da API', ()
   assert.match(appHtml, /AedApi\.submitExercise\(ex\.id, btn\.dataset\.answer, elapsed\)/);
 });
 
+test('prática fica centralizada em Exercícios e navegação volta ao topo', () => {
+  assert.match(appHtml, /id="page-exercicios"/);
+  assert.match(appHtml, /id="practice-topic-select"/);
+  assert.match(appHtml, /id="practice-dynamic-host"/);
+  assert.match(appHtml, /id="practice-code-host"/);
+  assert.match(appHtml, /async function renderPracticeWorkspace\(preferredTopicId\)/);
+  assert.match(appHtml, /function scrollMainToTop\(\)/);
+  assert.match(appHtml, /if\(pageId === 'exercicios'\) renderPracticeWorkspace\(\);[\s\S]*else renderSimulatorPanel\(pageId\);/);
+  assert.match(appHtml, /content\.scrollTo\(\{ top: 0, left: 0, behavior: 'auto' \}\)/);
+  assert.ok(appHtml.indexOf('id="ni-exercicios"') > appHtml.indexOf('id="grp-paradigmas"'));
+});
+
 test('simuladores, recomendações, analytics e exercícios dinâmicos estão integrados à API', () => {
   assert.match(appHtml, /SIMULATOR_CONFIGS/);
   assert.match(appHtml, /type:'ARRAY'/);

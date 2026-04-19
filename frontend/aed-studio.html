@@ -264,6 +264,17 @@ html, body {
 .recommendation-item .meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text2); text-transform: uppercase; margin-bottom: 4px; }
 .simulator-panel, .dynamic-exercise-panel { margin: 12px 0 18px; background: var(--bg1); border: 1px solid var(--border); border-left: 3px solid var(--teal); border-radius: 8px; padding: 14px; }
 .simulator-panel { border-left-color: var(--accent); }
+.practice-topic-card { border: 1px solid var(--border); background: var(--bg1); border-radius: 8px; padding: 14px; }
+.practice-tools-grid { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 14px; margin-top: 14px; }
+.practice-tool-panel { background: var(--bg1); border: 1px solid var(--border); border-radius: 8px; padding: 14px; min-width: 0; }
+.practice-tool-panel.required { border-left: 3px solid var(--green); }
+.practice-tool-panel.dynamic { border-left: 3px solid var(--teal); }
+.practice-tool-panel.code { border-left: 3px solid var(--purple); }
+.practice-tool-panel.sim { border-left: 3px solid var(--accent); }
+.practice-tool-panel.full { grid-column: 1 / -1; }
+.practice-select-row { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-top:12px; }
+.practice-select-row label { display:flex; flex-direction:column; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:.08em; }
+.practice-select-row select { background:var(--bg2); border:1px solid var(--border); color:var(--text0); border-radius:6px; padding:9px 10px; min-width:260px; font-family:'IBM Plex Mono',monospace; }
 .simulator-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
 .simulator-toolbar input, .simulator-toolbar select { background: var(--bg2); border: 1px solid var(--border); color: var(--text0); border-radius: 6px; padding: 8px 10px; min-width: 82px; }
 .simulator-toolbar button, .dynamic-exercise-panel button { border: 1px solid var(--border); background: var(--bg2); color: var(--text1); border-radius: 6px; padding: 8px 10px; cursor: pointer; }
@@ -808,9 +819,12 @@ canvas { display: block; width: 100%; }
   .edu-kpis,
   .track-row,
   .expedition-grid,
-  .analytics-grid {
+  .analytics-grid,
+  .practice-tools-grid {
     grid-template-columns: 1fr;
   }
+  .practice-tool-panel.full { grid-column: auto; }
+  .practice-select-row select { min-width: 0; width: 100%; }
   .track-row { gap: 6px; }
   .simulator-toolbar input, .simulator-toolbar select { flex: 1; min-width: 120px; }
   .sim-stage { padding: 10px; }
@@ -965,6 +979,8 @@ canvas { display: block; width: 100%; }
       <div class="ni" id="ni-pd" onclick="nav(this,'pd','paradigmas/prog-dinamica')"><div class="nd" id="nd-pd"></div>Programação Dinâmica</div>
       <div class="ni" id="ni-guloso" onclick="nav(this,'guloso','paradigmas/guloso')"><div class="nd" id="nd-guloso"></div>Algoritmos Gulosos</div>
     </div>
+
+    <div class="ni" id="ni-exercicios" onclick="nav(this,'exercicios','extra/exercícios')"><div class="nd" id="nd-exercicios"></div>Exercícios</div>
   </div>
 
   <div class="sfooter">
@@ -1217,6 +1233,52 @@ canvas { display: block; width: 100%; }
         <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--amber);margin-bottom:5px">04 QUIZ</div>
         <div style="font-size:11px;color:var(--text2);line-height:1.6">Perguntas técnicas com feedback imediato</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════
+     EXERCÍCIOS
+══════════════════════════════════════════════════ -->
+<div class="page" id="page-exercicios">
+  <div class="ph">
+    <div class="pey">base de prática · ferramentas</div>
+    <div class="ptitle">Exercícios</div>
+    <div class="ptags"><span class="tag tt">quiz</span><span class="tag ti">dinâmicos</span><span class="tag tc">código</span><span class="tag ts2">simuladores</span></div>
+  </div>
+
+  <div class="sec">
+    <div class="sectitle">// estação de treino</div>
+    <div class="def">
+      <div class="lbl">como funciona</div>
+      Escolha o tema que deseja praticar. O servidor entrega os exercícios, registra tentativas, corrige respostas e atualiza XP, progresso e recomendações. Para gerar exercícios dinâmicos, corrigir código ou salvar histórico, mantenha o backend rodando.
+    </div>
+    <div class="practice-topic-card">
+      <div class="expedition-kicker">// tema de estudo</div>
+      <div class="practice-select-row">
+        <label for="practice-topic-select">
+          tópico
+          <select id="practice-topic-select" aria-label="Escolher tópico para praticar"></select>
+        </label>
+        <button class="btn primary" id="practice-refresh-btn" type="button">atualizar ferramentas</button>
+        <button class="btn" id="practice-open-topic-btn" type="button">abrir teoria</button>
+      </div>
+      <div class="expedition-copy" id="practice-topic-state" style="margin-top:10px">Carregando estado do tópico...</div>
+    </div>
+  </div>
+
+  <div class="practice-tools-grid">
+    <div class="practice-tool-panel required" id="practice-required-host">
+      <div class="expedition-copy">Selecione um tópico para carregar o quiz obrigatório.</div>
+    </div>
+    <div class="practice-tool-panel dynamic" id="practice-dynamic-host">
+      <div class="expedition-copy">Selecione um tópico para gerar uma variação dinâmica.</div>
+    </div>
+    <div class="practice-tool-panel code full" id="practice-code-host">
+      <div class="expedition-copy">Selecione um tópico para carregar o testador de código.</div>
+    </div>
+    <div class="practice-tool-panel sim full" id="practice-simulator-host">
+      <div class="expedition-copy">Selecione um tópico para carregar o simulador disponível.</div>
     </div>
   </div>
 </div>
@@ -3485,6 +3547,7 @@ const ESTRUTURAS_IDS  = ['arrays','pilhas','ll','bst','avl','heap','hash'];
 
 const TAB_META = {
   home:{c:'var(--accent)',n:'inicio.md'},
+  exercicios:{c:'var(--green)',n:'Exercicios.java'},
   algoritmos:{c:'var(--purple)',n:'Algoritmo.md'},
   tad:{c:'var(--purple)',n:'TAD.java'},
   notacao:{c:'var(--coral)',n:'Notacao.md'},analise:{c:'var(--green)',n:'Analise.java'},
@@ -3595,6 +3658,7 @@ async function nav(el, pageId, pathStr) {
   }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg=document.getElementById('page-'+pageId);if(pg)pg.classList.add('active');
+  scrollMainToTop();
   const label=pathStr.split('/').pop().replace(/-/g,' ');
   document.getElementById('path-current').textContent=label;
   document.getElementById('sb-topic').textContent=pathStr;
@@ -3608,10 +3672,8 @@ async function nav(el, pageId, pathStr) {
   if (window.innerWidth <= 768) closeSidebar();
   setTimeout(()=>{
     initPage(pageId);
-    renderExercisePanel(pageId);
-    renderSimulatorPanel(pageId);
-    renderDynamicExercisePanel(pageId);
-    renderCodeSandboxPanel(pageId);
+    if(pageId === 'exercicios') renderPracticeWorkspace();
+    else renderSimulatorPanel(pageId);
   },80);
 }
 
@@ -3696,6 +3758,12 @@ function getActivePageId() {
   return active?.id?.replace('page-','') || 'home';
 }
 
+function scrollMainToTop() {
+  const content = document.querySelector('.content');
+  if (content) content.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+}
+
 function insertLearningPanel(page, panel) {
   const firstSec = page.querySelector('.sec');
   if (firstSec?.parentNode) firstSec.parentNode.insertBefore(panel, firstSec);
@@ -3721,10 +3789,9 @@ function applyProgress(progress, options = {}) {
   updateIconStates();
   renderDashboard();
   if (rerenderLearningPanels) {
-    renderExercisePanel(getActivePageId());
-    renderSimulatorPanel(getActivePageId());
-    renderDynamicExercisePanel(getActivePageId());
-    renderCodeSandboxPanel(getActivePageId());
+    const activePageId = getActivePageId();
+    if (activePageId === 'exercicios') renderPracticeWorkspace();
+    else renderSimulatorPanel(activePageId);
   }
   queueEducationSignalRefresh();
 }
@@ -3902,6 +3969,267 @@ function renderAnalyticsOverview() {
     }
     attention.innerHTML += `<div class="mission-card"><div class="meta">histórico de XP</div><div class="xp-history">${bars || '<span class="expedition-copy">Sem XP registrado ainda.</span>'}</div></div>`;
   }
+}
+
+function getTopicTitle(topicId) {
+  const state = serverProgress.topicStates?.[topicId];
+  const catalogTopic = topicCatalog.find(t => (t.topicId || t.id) === topicId);
+  const tabName = TAB_META[topicId]?.n || topicId;
+  return state?.title || catalogTopic?.title || catalogTopic?.name || tabName.replace(/\.(java|md)$/i, '');
+}
+
+function getTopicPath(topicId) {
+  const state = serverProgress.topicStates?.[topicId];
+  const catalogTopic = topicCatalog.find(t => (t.topicId || t.id) === topicId);
+  return state?.path || catalogTopic?.path || topicId;
+}
+
+function getPracticeTopics() {
+  const fromCatalog = topicCatalog
+    .map(t => ({ ...t, id: t.topicId || t.id }))
+    .filter(t => isTrackableTopic(t.id));
+  const source = fromCatalog.length
+    ? fromCatalog
+    : Object.keys(PAGE_TOPIC).filter(isTrackableTopic).map(id => ({ id, orderIndex: PAGE_TOPIC[id] }));
+  return source
+    .map(t => ({ ...t, title: getTopicTitle(t.id), orderIndex: t.orderIndex ?? PAGE_TOPIC[t.id] ?? 999 }))
+    .sort((a, b) => a.orderIndex - b.orderIndex);
+}
+
+function getPracticeTopicState(topicId) {
+  return serverProgress.topicStates?.[topicId]?.state || serverProgress.topics?.[topicId] || 'AVAILABLE';
+}
+
+function getPracticeStateLabel(topicId) {
+  const state = getPracticeTopicState(topicId);
+  const labels = {
+    LOCKED: 'bloqueado por pré-requisito',
+    AVAILABLE: 'disponível para prática',
+    VISITED: 'visitado, ainda em consolidação',
+    COMPLETED: 'concluído, disponível para revisão',
+  };
+  return labels[state] || 'disponível para prática';
+}
+
+function resolvePracticeTopic(preferredTopicId) {
+  const topics = getPracticeTopics();
+  const selected = preferredTopicId || document.getElementById('practice-topic-select')?.value;
+  if (selected && topics.some(t => t.id === selected)) return selected;
+  const active = getActivePageId();
+  if (isTrackableTopic(active)) return active;
+  return topics.find(t => getPracticeTopicState(t.id) !== 'LOCKED')?.id || topics[0]?.id || 'algoritmos';
+}
+
+function renderPracticeSelector(topicId) {
+  const select = document.getElementById('practice-topic-select');
+  const stateEl = document.getElementById('practice-topic-state');
+  if (!select) return;
+  const topics = getPracticeTopics();
+  select.innerHTML = topics.map(t => {
+    const state = getPracticeTopicState(t.id);
+    const locked = state === 'LOCKED';
+    return `<option value="${t.id}" ${t.id === topicId ? 'selected' : ''} ${locked ? 'disabled' : ''}>${escapeHtml(t.title)}${locked ? ' · bloqueado' : ''}</option>`;
+  }).join('');
+  select.value = topicId;
+  select.onchange = () => renderPracticeWorkspace(select.value);
+  const refreshBtn = document.getElementById('practice-refresh-btn');
+  if (refreshBtn) refreshBtn.onclick = () => renderPracticeWorkspace(select.value);
+  const openBtn = document.getElementById('practice-open-topic-btn');
+  if (openBtn) openBtn.onclick = () => nav(null, select.value, getTopicPath(select.value));
+  if (stateEl) {
+    stateEl.textContent = `${getTopicTitle(topicId)} · ${getPracticeStateLabel(topicId)}`;
+  }
+}
+
+function renderPracticeLocked(host, title, topicId) {
+  if (!host) return;
+  host.innerHTML = `
+    <div class="expedition-kicker">${title}</div>
+    <div class="expedition-title">${getTopicTitle(topicId)}</div>
+    <div class="exercise-feedback" style="color:var(--amber)">Complete os pré-requisitos para liberar esta prática.</div>`;
+}
+
+async function renderPracticeRequiredTool(topicId) {
+  const host = document.getElementById('practice-required-host');
+  if (!host) return;
+  if (getPracticeTopicState(topicId) === 'LOCKED') {
+    renderPracticeLocked(host, '// quiz obrigatório', topicId);
+    return;
+  }
+  host.innerHTML = `
+    <div class="expedition-kicker">// quiz obrigatório</div>
+    <div class="expedition-title">Carregando pergunta de ${escapeHtml(getTopicTitle(topicId))}...</div>`;
+  const exercises = await AedApi.getExercises(topicId);
+  if (!exercises?.length) {
+    host.innerHTML = `
+      <div class="expedition-kicker">// quiz obrigatório</div>
+      <div class="expedition-title">${escapeHtml(getTopicTitle(topicId))}</div>
+      <div class="expedition-copy">Nenhum quiz obrigatório disponível para este tema agora.</div>`;
+    return;
+  }
+  const ex = exercises[0];
+  host.innerHTML = `
+    <div class="expedition-kicker">// quiz obrigatório</div>
+    <div class="expedition-title">${escapeHtml(getTopicTitle(topicId))}</div>
+    <div style="font-size:13px;color:var(--text0);line-height:1.6">${ex.prompt}</div>
+    <div class="exercise-options">
+      ${(ex.options || []).map((option, idx) => `<button class="exercise-option" data-answer="${String.fromCharCode(65+idx)}">${String.fromCharCode(65+idx)}) ${option}</button>`).join('')}
+    </div>
+    <div class="exercise-feedback"></div>`;
+  host.dataset.startedAt = Date.now();
+  host.querySelectorAll('.exercise-option').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      host.querySelectorAll('.exercise-option').forEach(b => b.disabled = true);
+      const elapsed = Math.max(0, Math.round((Date.now() - Number(host.dataset.startedAt || Date.now())) / 1000));
+      const result = await AedApi.submitExercise(ex.id, btn.dataset.answer, elapsed);
+      const fb = host.querySelector('.exercise-feedback');
+      if (!result) {
+        fb.textContent = 'Não foi possível enviar a resposta. Verifique se o backend está rodando.';
+        fb.style.color = 'var(--coral)';
+        host.querySelectorAll('.exercise-option').forEach(b => b.disabled = false);
+        return;
+      }
+      fb.textContent = (result.correct ? 'Correto. ' : 'Revise e tente novamente. ') + result.feedback + (result.awarded ? ' +' + result.awarded + ' XP' : '');
+      fb.style.color = result.correct ? 'var(--green)' : 'var(--coral)';
+      if (result.progress) applyProgress(result.progress, { rerenderLearningPanels: false });
+      if (!result.correct) host.querySelectorAll('.exercise-option').forEach(b => b.disabled = false);
+    });
+  });
+}
+
+function renderPracticeDynamicTool(topicId) {
+  const host = document.getElementById('practice-dynamic-host');
+  if (!host) return;
+  if (getPracticeTopicState(topicId) === 'LOCKED') {
+    renderPracticeLocked(host, '// exercício dinâmico', topicId);
+    return;
+  }
+  host.innerHTML = `
+    <div class="expedition-kicker">// exercício dinâmico</div>
+    <div class="expedition-title">Gerar variação de ${escapeHtml(getTopicTitle(topicId))}</div>
+    <div class="expedition-copy">O backend cria, registra e corrige exatamente a versão entregue.</div>
+    <div class="simulator-toolbar">
+      <select class="dynamic-difficulty"><option value="1">dificuldade 1</option><option value="2">dificuldade 2</option><option value="3">dificuldade 3</option></select>
+      <button class="dynamic-generate">gerar exercício</button>
+    </div>
+    <div class="dynamic-host"></div>`;
+  host.querySelector('.dynamic-generate').addEventListener('click', async () => {
+    const difficulty = Number(host.querySelector('.dynamic-difficulty').value || 1);
+    const exercise = await AedApi.generateExercise(topicId, difficulty);
+    renderGeneratedExercise(host.querySelector('.dynamic-host'), exercise);
+  });
+}
+
+async function renderPracticeCodeTool(topicId) {
+  const host = document.getElementById('practice-code-host');
+  if (!host) return;
+  if (getPracticeTopicState(topicId) === 'LOCKED') {
+    renderPracticeLocked(host, '// testador de código', topicId);
+    return;
+  }
+  host.innerHTML = `
+    <div class="expedition-kicker">// testador de código</div>
+    <div class="expedition-title">Carregando desafio de ${escapeHtml(getTopicTitle(topicId))}...</div>`;
+  const challenges = await AedApi.getCodeChallenges(topicId);
+  if (!challenges?.length) {
+    host.innerHTML = `
+      <div class="expedition-kicker">// testador de código</div>
+      <div class="expedition-title">${escapeHtml(getTopicTitle(topicId))}</div>
+      <div class="expedition-copy">Este tema ainda não possui desafio de código no judge.</div>`;
+    return;
+  }
+  const challenge = challenges[0];
+  const examples = (challenge.examples || []).map(example => `<div>${escapeHtml(example)}</div>`).join('');
+  host.innerHTML = `
+    <div class="expedition-kicker">// testador de código</div>
+    <div class="expedition-title">${escapeHtml(challenge.title)}</div>
+    <div class="expedition-copy">${challenge.prompt}</div>
+    <div class="code-contract">
+      <pre>${escapeHtml((challenge.returnType || 'int') + ' ' + (challenge.signature || 'solve(int[] values)'))}</pre>
+      <div class="mission-card">
+        <div class="meta">exemplos</div>
+        <div class="expedition-copy">${examples || 'Os cenários reais ficam no judge.'}</div>
+      </div>
+    </div>
+    <div class="mission-card">
+      <div class="meta">dica conceitual</div>
+      <div class="expedition-copy">${challenge.conceptualHint || 'Preserve o contrato do método e pense nos casos de borda.'}</div>
+      <details>
+        <summary class="expedition-copy">ver dica estrutural e pseudoesqueleto</summary>
+        <div class="expedition-copy">${challenge.structuralHint || ''}</div>
+        <pre style="white-space:pre-wrap;color:var(--text1);font-size:12px">${challenge.pseudoSkeleton || ''}</pre>
+      </details>
+    </div>
+    <textarea spellcheck="false">${challenge.starterCode || ''}</textarea>
+    <div class="simulator-toolbar">
+      <button class="code-run">executar no sandbox</button>
+      <span class="expedition-copy">Ambiente isolado · dificuldade ${challenge.difficulty || 1} · ${challenge.xp || 0} XP.</span>
+    </div>
+    <div class="exercise-feedback"></div>
+    <div class="mission-card">
+      <div class="meta">histórico de submissões</div>
+      <div class="code-history"><div class="expedition-copy">Carregando histórico...</div></div>
+    </div>`;
+  refreshCodeHistory(host, challenge.id);
+  host.querySelector('.code-run').addEventListener('click', async () => {
+    const result = await AedApi.runCode(challenge.id, host.querySelector('textarea').value);
+    const fb = host.querySelector('.exercise-feedback');
+    if (!result) {
+      fb.textContent = 'Não foi possível executar o desafio. Verifique se o backend está rodando.';
+      fb.style.color = 'var(--coral)';
+      return;
+    }
+    const passed = result.passedChecks || [];
+    const failed = result.failedChecks || [];
+    fb.innerHTML = `
+      <div>${result.feedback}${result.awarded ? ' +' + result.awarded + ' XP' : ''}</div>
+      <div class="meta">${result.status || ''} · submissão #${result.submissionId || '-'} · ${result.executionTimeMs || 0} ms · ${result.passedCount || passed.length}/${result.totalChecks || (passed.length + failed.length)} cenários passaram</div>
+      ${passed.length ? `<div class="expedition-copy"><strong>passaram:</strong> ${passed.join(', ')}</div>` : ''}
+      ${failed.length ? `<div class="expedition-copy"><strong>ajustar:</strong> ${failed.join(', ')}</div>` : ''}
+      ${result.hint ? `<div class="expedition-copy"><strong>dica:</strong> ${result.hint}</div>` : ''}`;
+    fb.style.color = result.accepted ? 'var(--green)' : 'var(--coral)';
+    if (result.progress) applyProgress(result.progress, { rerenderLearningPanels: false });
+    refreshCodeHistory(host, challenge.id);
+  });
+}
+
+function renderPracticeSimulatorTool(topicId) {
+  const host = document.getElementById('practice-simulator-host');
+  if (!host) return;
+  if (getPracticeTopicState(topicId) === 'LOCKED') {
+    renderPracticeLocked(host, '// simulador', topicId);
+    return;
+  }
+  const configs = SIMULATOR_CONFIGS[topicId];
+  if (!configs?.length) {
+    host.innerHTML = `
+      <div class="expedition-kicker">// simulador</div>
+      <div class="expedition-title">${escapeHtml(getTopicTitle(topicId))}</div>
+      <div class="expedition-copy">Este tema ainda não possui simulador específico. Use quiz, exercícios dinâmicos e código para praticar.</div>`;
+    return;
+  }
+  host.innerHTML = `
+    <div class="expedition-kicker">// simulador</div>
+    <div class="expedition-title">Laboratório visual de ${escapeHtml(getTopicTitle(topicId))}</div>
+    <div class="expedition-copy">As operações visuais acontecem no navegador; marcos e missões são registrados no servidor.</div>
+    ${configs.length > 1 ? `<div class="simulator-toolbar">${configs.map((c, i) => `<button data-practice-sim-tab="${i}">${c.title}</button>`).join('')}</div>` : ''}
+    <div class="simulator-host"></div>`;
+  const renderAt = index => {
+    host.querySelectorAll('[data-practice-sim-tab]').forEach((b, i) => b.classList.toggle('active', i === index));
+    renderSimulatorInstance(host.querySelector('.simulator-host'), configs[index]);
+  };
+  host.querySelectorAll('[data-practice-sim-tab]').forEach((btn, idx) => btn.addEventListener('click', () => renderAt(idx)));
+  renderAt(0);
+}
+
+async function renderPracticeWorkspace(preferredTopicId) {
+  if (!document.getElementById('page-exercicios')) return;
+  const topicId = resolvePracticeTopic(preferredTopicId);
+  renderPracticeSelector(topicId);
+  await renderPracticeRequiredTool(topicId);
+  renderPracticeDynamicTool(topicId);
+  await renderPracticeCodeTool(topicId);
+  renderPracticeSimulatorTool(topicId);
 }
 
 const SIMULATOR_CONFIGS = {
@@ -4136,7 +4464,7 @@ async function loadSimulatorMissions(host, config, state) {
     }
     fb.textContent = result.feedback + (result.awarded ? ' +' + result.awarded + ' XP' : '');
     fb.style.color = result.completed ? 'var(--green)' : 'var(--coral)';
-    if (result.progress) applyProgress(result.progress);
+    if (result.progress) applyProgress(result.progress, { rerenderLearningPanels: false });
   }));
 }
 
@@ -4192,7 +4520,7 @@ function renderGeneratedExercise(host, exercise) {
     }
     fb.textContent = (result.correct ? 'Correto. ' : 'Revise. ') + result.feedback + (result.awarded ? ' +' + result.awarded + ' XP' : '');
     fb.style.color = result.correct ? 'var(--green)' : 'var(--coral)';
-    if (result.progress) applyProgress(result.progress);
+    if (result.progress) applyProgress(result.progress, { rerenderLearningPanels: false });
     if (!result.correct) host.querySelectorAll('.exercise-option').forEach(b => b.disabled = false);
   }));
 }
@@ -4316,10 +4644,11 @@ function addTab(pageId,pathStr){
     bar.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');
     document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
     const pg=document.getElementById('page-'+pageId);if(pg)pg.classList.add('active');
-    renderExercisePanel(pageId);
-    renderSimulatorPanel(pageId);
-    renderDynamicExercisePanel(pageId);
-    renderCodeSandboxPanel(pageId);
+    scrollMainToTop();
+    document.getElementById('path-current').textContent=(pathStr || pageId).split('/').pop().replace(/-/g,' ');
+    document.getElementById('sb-topic').textContent=pathStr || pageId;
+    if(pageId === 'exercicios') renderPracticeWorkspace();
+    else renderSimulatorPanel(pageId);
   });
   bar.appendChild(tab);
 }
