@@ -35,8 +35,11 @@ O projeto foi pensado como MVP sério: o back-end é a fonte de verdade para aut
 - [Manual de execução](MANUAL_EXECUCAO.md)
 - [Arquitetura](docs/ARCHITECTURE.md)
 - [API Reference](docs/API_REFERENCE.md)
+- [Operação local](docs/OPERATIONS.md)
+- [Sandbox e judge](docs/SANDBOX.md)
+- [Modularização do front-end](docs/FRONTEND_MODULARIZATION.md)
 - [Testes e CI](docs/TESTING_AND_CI.md)
-- [Roadmap](docs/ROADMAP.md)
+- [Roadmap](ROADMAP.md)
 - [Guia para subir no GitHub](docs/GUIA-GITHUB.md)
 - [Contribuindo](CONTRIBUTING.md)
 - [Segurança](SECURITY.md)
@@ -103,7 +106,9 @@ aed-studio/
 ├── frontend/
 │   ├── login.html                       ← tela de autenticação
 │   ├── api.js                           ← cliente HTTP com refresh automático
-│   └── aed-studio.html                  ← plataforma principal e experiência interativa
+│   ├── aed-studio.html                  ← plataforma principal e experiência interativa
+│   └── js/                              ← módulos incrementais por domínio
+├── docker-compose.yml                   ← banco + API + front-end
 ├── playwright.config.js                 ← E2E real com backend + frontend
 ├── .github/workflows/ci.yml             ← testes automatizados multiplataforma
 ├── .env.example                         ← template de variáveis de ambiente
@@ -121,16 +126,33 @@ Para um passo a passo completo de execução local, mobile, testes e sandbox de 
 | Ferramenta | Versão mínima | Download |
 |---|---|---|
 | Java (JDK) | 17 LTS | https://adoptium.net |
-| Maven | 3.9 | https://maven.apache.org (ou use o wrapper `mvnw` incluso) |
+| Maven | 3.9 | https://maven.apache.org |
 | PostgreSQL | 14 | https://www.postgresql.org/download |
 
-> **Dica:** se você não quiser instalar o Maven globalmente, o projeto inclui o Maven Wrapper (`mvnw` / `mvnw.cmd`). Os comandos abaixo usam o wrapper quando possível.
+> **Dica:** esta versão usa Maven direto (`mvn`). Se o Maven Wrapper for adicionado no futuro, mantenha README, CI e manual alinhados no mesmo PR.
 
 > **Java padronizado:** o projeto é desenvolvido e validado com **Java 17 LTS**. O CI do GitHub usa Temurin 17 em Linux, Windows e macOS, e a raiz do repositório contém `.java-version` com `17` para ferramentas como jEnv, asdf e SDKMAN. Evite rodar o back-end com Java 21/24 por enquanto: versões mais novas podem emitir warnings de bibliotecas internas ou mudar restrições futuras sem indicar erro no código da aplicação.
 
 ---
 
 ## Passo a passo de configuração
+
+### Caminho rápido: Docker Compose
+
+Para uma primeira demonstração local, use:
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+Depois acesse:
+
+- Front-end: `http://localhost:8081`
+- Back-end: `http://localhost:8080`
+- Health check: `http://localhost:8080/api/health`
+
+O Compose sobe PostgreSQL, API e front-end. O sandbox usa `CODE_SANDBOX_MODE=local` por padrão para reduzir atrito no desenvolvimento. Para uso público, configure `CODE_SANDBOX_MODE=docker` e revise [`docs/SANDBOX.md`](docs/SANDBOX.md).
 
 ### 1. Clonar o repositório
 
@@ -200,10 +222,10 @@ cd backend
 
 # Carrega as variáveis do .env e sobe o servidor
 export $(grep -v '^#' ../.env | xargs)
-./mvnw spring-boot:run
+mvn spring-boot:run
 
 # Com perfil dev explícito (logs detalhados):
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 **Windows — Prompt de Comando (cmd.exe)**
@@ -215,7 +237,7 @@ for /f "tokens=1,2 delims==" %i in (..\.env) do (
     if not "%i"=="" if not "%i:~0,1%"=="#" set %i=%j
 )
 
-mvnw.cmd spring-boot:run
+mvn spring-boot:run
 ```
 
 **Windows — PowerShell**
@@ -230,7 +252,7 @@ Get-Content ..\.env |
     [System.Environment]::SetEnvironmentVariable($parts[0].Trim(), $parts[1].Trim(), 'Process')
   }
 
-.\mvnw.cmd spring-boot:run
+mvn spring-boot:run
 ```
 
 Aguarde a mensagem `Started AedStudioApplication` no console. O servidor estará disponível em:
@@ -265,13 +287,13 @@ Os testes de integração usam H2 em memória — **não precisam de PostgreSQL 
 **Linux / macOS**
 ```bash
 cd backend
-./mvnw test
+mvn test
 ```
 
 **Windows**
 ```cmd
 cd backend
-mvnw.cmd test
+mvn test
 ```
 
 **Front-end**

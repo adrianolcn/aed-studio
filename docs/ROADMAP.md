@@ -4,6 +4,13 @@ Este roadmap organiza evoluções futuras sem perder a coerência arquitetural d
 
 ## Próxima Fase Recomendada
 
+### 0. Maturidade Operacional
+
+- Completar extração gradual do script inline para `frontend/js/`.
+- Manter Docker Compose como caminho demonstrável de 1 comando.
+- Expandir E2E por domínio com Playwright.
+- Tornar sandbox Docker obrigatório fora de desenvolvimento.
+
 ### 1. Judge Multi-Linguagem
 
 - Suporte a Python e JavaScript.

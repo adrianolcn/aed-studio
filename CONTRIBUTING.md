@@ -16,14 +16,7 @@ Back-end:
 
 ```bash
 cd backend
-./mvnw test
-```
-
-Windows:
-
-```powershell
-cd backend
-.\mvnw.cmd test
+mvn test
 ```
 
 Front-end:

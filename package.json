@@ -4,11 +4,16 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
+    "test": "npm run test:frontend:contracts",
+    "test:all": "npm run test:frontend && npm run test:e2e",
     "test:frontend": "npm run test:frontend:contracts && npm run test:frontend:visual",
     "test:frontend:contracts": "node frontend/tests/api.test.js && node frontend/tests/app-contract.test.js",
     "test:frontend:visual": "node frontend/tests/visual-e2e.test.js",
     "test:e2e": "playwright test",
-    "playwright:install": "playwright install --with-deps chromium"
+    "playwright:install": "playwright install --with-deps chromium",
+    "compose:config": "docker compose config",
+    "compose:up": "docker compose up --build",
+    "compose:down": "docker compose down"
   },
   "devDependencies": {
     "@playwright/test": "^1.45.0"

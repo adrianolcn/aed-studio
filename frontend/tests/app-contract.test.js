@@ -7,6 +7,7 @@ const root = path.join(__dirname, '..');
 const appHtml = fs.readFileSync(path.join(root, 'aed-studio.html'), 'utf8');
 const loginHtml = fs.readFileSync(path.join(root, 'login.html'), 'utf8');
 const apiJs = fs.readFileSync(path.join(root, 'api.js'), 'utf8');
+const moduleIndexJs = fs.readFileSync(path.join(root, 'js', 'index.js'), 'utf8');
 
 test('tela principal carrega o cliente central e exige autenticação', () => {
   assert.match(appHtml, /<script src="api\.js"><\/script>/);
@@ -54,6 +55,14 @@ test('prática fica centralizada em Exercícios e navegação volta ao topo', ()
   assert.match(appHtml, /content\.scrollTo\(\{ top: 0, left: 0, behavior: 'auto' \}\)/);
   assert.ok(appHtml.indexOf('id="ni-exercicios"') > appHtml.indexOf('id="grp-paradigmas"'));
   assert.ok(appHtml.indexOf('id="asymptotic-tool"') < appHtml.indexOf('id="practice-required-host"'));
+});
+
+test('frontend possui camada modular incremental sem migrar de framework', () => {
+  assert.match(appHtml, /<script type="module" src="js\/index.js"><\/script>/);
+  assert.match(loginHtml, /<script type="module" src="js\/index.js"><\/script>/);
+  assert.match(moduleIndexJs, /window\.AedStudioModules/);
+  assert.match(moduleIndexJs, /simulatorTypes/);
+  assert.match(moduleIndexJs, /sandboxModes/);
 });
 
 test('explicações didáticas cobrem assintótica, ordenação e Dijkstra', () => {

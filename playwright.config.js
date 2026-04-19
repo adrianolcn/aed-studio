@@ -1,9 +1,6 @@
 const { defineConfig, devices } = require('@playwright/test');
 
-const isWindows = process.platform === 'win32';
-const backendCommand = isWindows
-  ? 'cd backend && .\\mvnw.cmd spring-boot:run "-Dspring-boot.run.profiles=e2e"'
-  : 'cd backend && ./mvnw spring-boot:run -Dspring-boot.run.profiles=e2e';
+const backendCommand = 'node scripts/run-e2e-backend.js';
 
 module.exports = defineConfig({
   testDir: './frontend/tests/e2e',
@@ -29,6 +26,10 @@ module.exports = defineConfig({
       url: 'http://127.0.0.1:8080/api/health',
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
+      env: {
+        ...process.env,
+        SPRING_PROFILES_ACTIVE: 'e2e',
+      },
     },
     {
       command: 'node frontend/tests/e2e/static-server.js',

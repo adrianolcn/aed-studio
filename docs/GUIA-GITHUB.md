@@ -34,17 +34,16 @@ Windows) e navegue até a pasta `aed-studio`. Ela deve estar assim:
 ├── 📄 README.md                 ← documentação do projeto
 │
 ├── 📁 backend/                  ← todo o código Java fica aqui
-│   ├── 📄 mvnw                  ← botão de iniciar (Linux/Mac)
-│   ├── 📄 mvnw.cmd              ← botão de iniciar (Windows)
 │   ├── 📄 pom.xml               ← lista de dependências Java
-│   ├── 📁 .mvn/wrapper/         ← configuração do Maven Wrapper
 │   └── 📁 src/                  ← código-fonte Java
 │
 ├── 📁 frontend/                 ← código HTML/JS fica aqui
 │   ├── 📄 login.html
-│   └── 📄 api.js
+│   ├── 📄 api.js
+│   └── 📁 js/                   ← módulos incrementais do front
 │
-└── 📁 docs/                     ← pasta para os screenshots futuros
+├── 📁 docs/                     ← documentação técnica
+└── 📄 docker-compose.yml        ← execução local com 1 comando
 ```
 
 > ✅ **Checklist rápido:**

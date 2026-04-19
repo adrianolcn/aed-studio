@@ -1,5 +1,24 @@
 # Changelog
 
+## 2.2.0 - Maturidade de Repositório e Operação
+
+### Adicionado
+
+- Templates de issue e pull request em `.github/`.
+- Workflow de CI com jobs de back-end, front-end e Playwright.
+- `docker-compose.yml` para subir banco, API e front-end.
+- Dockerfiles para back-end e front-end.
+- `backend/pom.xml` com dependências Spring Boot/Java 17.
+- Camada modular incremental em `frontend/js/`.
+- Documentação de operação, sandbox e modularização do front-end.
+- `ROADMAP.md` na raiz para leitura rápida no GitHub.
+
+### Alterado
+
+- README e manual passam a documentar caminho rápido com Docker Compose.
+- Documentação passa a usar Maven direto (`mvn`) como comando padrão.
+- Testes contratuais validam a presença da camada modular do front-end.
+
 ## 2.1.0 - Code Judge, Submissões e E2E
 
 ### Adicionado

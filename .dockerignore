@@ -1,0 +1,10 @@
+.git
+node_modules
+dist
+test-results
+playwright-report
+backend/target
+.m2
+frontend/tests
+*.log
+.env

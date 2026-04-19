@@ -51,7 +51,24 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 java -version
 ```
 
-## 3. Preparar o Banco PostgreSQL
+## 3. Caminho Rápido com Docker Compose
+
+Se você quer apenas subir tudo para testar a plataforma:
+
+```bash
+cp .env.example .env
+docker compose up --build
+```
+
+Acesse:
+
+- Front-end: `http://localhost:8081`
+- Back-end: `http://localhost:8080`
+- Health: `http://localhost:8080/api/health`
+
+O modo Compose sobe PostgreSQL, API e front-end. Para uma explicação operacional mais completa, consulte [`docs/OPERATIONS.md`](docs/OPERATIONS.md).
+
+## 4. Preparar o Banco PostgreSQL
 
 Abra o PostgreSQL, pgAdmin ou terminal `psql` e execute:
 
@@ -62,7 +79,7 @@ CREATE DATABASE aedstudio OWNER aedstudio;
 
 O Flyway cria as tabelas automaticamente quando o back-end iniciar.
 
-## 4. Criar o Arquivo `.env`
+## 5. Criar o Arquivo `.env`
 
 Na raiz do projeto, copie:
 
@@ -103,7 +120,7 @@ Para gerar um `JWT_SECRET` no PowerShell:
 
 Importante: não suba o `.env` para o GitHub.
 
-## 5. Carregar o `.env` no PowerShell
+## 6. Carregar o `.env` no PowerShell
 
 Antes de iniciar o back-end, rode este comando na raiz do projeto:
 
@@ -118,7 +135,7 @@ Get-Content .env |
 
 Isso carrega as variáveis apenas para o terminal atual.
 
-## 6. Iniciar o Back-End
+## 7. Iniciar o Back-End
 
 Entre na pasta `backend`:
 
@@ -129,7 +146,7 @@ cd backend
 Inicie:
 
 ```powershell
-.\mvnw.cmd spring-boot:run
+mvn spring-boot:run
 ```
 
 Aguarde aparecer algo parecido com:
@@ -158,7 +175,7 @@ Resposta esperada:
 }
 ```
 
-## 7. Abrir o Front-End
+## 8. Abrir o Front-End
 
 Com o back-end rodando, abra o front-end por um servidor local. Esse ponto é importante: abrir `frontend/aed-studio.html` com duplo clique, em modo `file://`, serve apenas para inspeção visual do HTML. A experiência real com login, progresso salvo, XP, simuladores integrados, recomendações e analytics precisa passar pelo servidor local e pela API Spring Boot.
 
@@ -183,7 +200,7 @@ frontend/aed-studio.html
 
 Se a tela principal for aberta diretamente pelo arquivo estático, ela não deve ficar escurecida nem travada, mas também não vai persistir progresso porque não existe sessão autenticada nesse modo.
 
-## 8. Rodar em Celular na Mesma Rede
+## 9. Rodar em Celular na Mesma Rede
 
 Esse passo serve para testar mobile real.
 
@@ -218,7 +235,7 @@ http://192.168.0.25:5500/frontend/login.html?apiBase=http://192.168.0.25:8080
 - `5500`, front-end.
 - `8080`, back-end.
 
-## 9. Ativar Sandbox Docker Para Produção
+## 10. Ativar Sandbox Docker Para Produção
 
 Para desenvolvimento, o projeto usa:
 
@@ -261,13 +278,13 @@ O judge aceita desafios com assinatura controlada. Hoje o front-end envia apenas
 
 Cada execução salva uma submissão com status, total de testes, testes aprovados, tempo e data/hora. Esse histórico aparece no painel do desafio e também entra nos analytics.
 
-## 10. Rodar Testes
+## 11. Rodar Testes
 
 Back-end:
 
 ```powershell
 cd backend
-.\mvnw.cmd test
+mvn test
 ```
 
 Resultado esperado:
@@ -308,7 +325,7 @@ Se o Playwright reclamar que o navegador não está instalado, rode:
 npx playwright install chromium
 ```
 
-## 11. URLs Úteis
+## 12. URLs Úteis
 
 API:
 
@@ -346,7 +363,7 @@ Plataforma:
 http://localhost:5500/frontend/aed-studio.html
 ```
 
-## 12. Fluxo Para Validar Que Tudo Está Funcionando
+## 13. Fluxo Para Validar Que Tudo Está Funcionando
 
 Faça este roteiro:
 
@@ -364,7 +381,7 @@ Faça este roteiro:
 
 Se tudo isso funcionar, a integração está ativa de ponta a ponta.
 
-## 13. Problemas Comuns
+## 14. Problemas Comuns
 
 ### A tela diz que a API está offline
 
@@ -442,13 +459,9 @@ npm run test:e2e
 
 ### GitHub Actions falha em poucos segundos no job backend
 
-Quando o projeto é preparado no Windows, o arquivo `backend/mvnw` pode chegar ao GitHub sem permissão de execução. O workflow atual cobre isso e valida a aplicação nos três sistemas principais:
+Esta versão usa Maven direto (`mvn`) no CI e no ambiente local, o que evita diferenças de permissão entre Linux, macOS e Windows. Se o Maven Wrapper (`mvnw`/`mvnw.cmd`) for adicionado no futuro, atualize README, CI e este manual no mesmo pull request.
 
-- Linux: usa `backend/mvnw` após `chmod +x`.
-- macOS: usa `backend/mvnw` após `chmod +x`.
-- Windows: usa `backend/mvnw.cmd`.
-
-O CI também roda os testes de front-end em Linux, macOS e Windows. Se aparecer um erro antigo como `Permission denied` em `./mvnw test`, atualize o repositório com a versão mais recente de `.github/workflows/ci.yml`.
+O CI também roda os testes de front-end em Linux, macOS e Windows.
 
 Os testes de contrato do front-end são obrigatórios nos três sistemas. O smoke visual com navegador é separado porque depende do Chrome headless disponível no runner; no GitHub Actions ele roda apenas no Linux. Em ambiente local, use:
 
@@ -457,7 +470,7 @@ npm run test:frontend:contracts
 npm run test:frontend:visual
 ```
 
-## 14. Checklist Antes de Subir Para o GitHub
+## 15. Checklist Antes de Subir Para o GitHub
 
 Não suba:
 
@@ -481,7 +494,7 @@ Suba:
 - `playwright.config.js`
 - `.github`, se quiser manter CI
 
-## 15. Comandos Rápidos
+## 16. Comandos Rápidos
 
 Back-end:
 
@@ -494,14 +507,14 @@ Get-Content .env |
   }
 
 cd backend
-.\mvnw.cmd spring-boot:run
+mvn spring-boot:run
 ```
 
 Testes:
 
 ```powershell
 cd backend
-.\mvnw.cmd test
+mvn test
 cd ..
 npm run test:frontend
 ```
@@ -512,5 +525,5 @@ Produção com Docker sandbox:
 docker pull eclipse-temurin:17-jdk
 $env:CODE_SANDBOX_MODE="docker"
 cd backend
-.\mvnw.cmd spring-boot:run
+mvn spring-boot:run
 ```

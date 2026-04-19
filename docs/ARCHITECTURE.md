@@ -27,6 +27,7 @@ flowchart LR
 | `dto` | Contratos explícitos entre API e front-end |
 | `frontend/api.js` | Cliente HTTP central com base configurável e refresh automático |
 | `frontend/aed-studio.html` | Experiência educacional, simuladores e renderização |
+| `frontend/js/` | Módulos incrementais por domínio para novas extrações |
 
 ## Fonte de Verdade
 
@@ -46,6 +47,12 @@ O back-end mantém a fonte de verdade para:
 - analytics.
 
 O front-end pode executar lógica visual, como animação de simuladores, mas eventos educacionais relevantes são enviados ao servidor.
+
+## Modularização do Front-end
+
+O front-end ainda é estático por decisão de produto e operação: isso facilita abrir, demonstrar e hospedar o projeto sem pipeline de build. Para reduzir acoplamento sem migração de framework, novos módulos vivem em `frontend/js/` e são carregados via `type="module"`.
+
+Ver detalhes em [`FRONTEND_MODULARIZATION.md`](FRONTEND_MODULARIZATION.md).
 
 ## Domínio Educacional
 
@@ -71,6 +78,8 @@ Assinaturas atuais:
 - `solve(String[] values)`
 
 Cada submissão é persistida como `CodeSubmission` e entra no histórico, analytics e recomendações.
+
+Detalhes operacionais, riscos e evolução do sandbox estão em [`SANDBOX.md`](SANDBOX.md).
 
 ## Ambiente de Teste E2E
 
