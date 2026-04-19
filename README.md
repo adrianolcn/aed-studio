@@ -120,11 +120,13 @@ Para um passo a passo completo de execução local, mobile, testes e sandbox de 
 
 | Ferramenta | Versão mínima | Download |
 |---|---|---|
-| Java (JDK) | 17 | https://adoptium.net |
+| Java (JDK) | 17 LTS | https://adoptium.net |
 | Maven | 3.9 | https://maven.apache.org (ou use o wrapper `mvnw` incluso) |
 | PostgreSQL | 14 | https://www.postgresql.org/download |
 
 > **Dica:** se você não quiser instalar o Maven globalmente, o projeto inclui o Maven Wrapper (`mvnw` / `mvnw.cmd`). Os comandos abaixo usam o wrapper quando possível.
+
+> **Java padronizado:** o projeto é desenvolvido e validado com **Java 17 LTS**. O CI do GitHub usa Temurin 17 em Linux, Windows e macOS, e a raiz do repositório contém `.java-version` com `17` para ferramentas como jEnv, asdf e SDKMAN. Evite rodar o back-end com Java 21/24 por enquanto: versões mais novas podem emitir warnings de bibliotecas internas ou mudar restrições futuras sem indicar erro no código da aplicação.
 
 ---
 

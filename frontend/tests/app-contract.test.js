@@ -38,11 +38,78 @@ test('prática fica centralizada em Exercícios e navegação volta ao topo', ()
   assert.match(appHtml, /id="practice-topic-select"/);
   assert.match(appHtml, /id="practice-dynamic-host"/);
   assert.match(appHtml, /id="practice-code-host"/);
+  assert.match(appHtml, /\.expedition-grid \{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 18px 0 32px;/);
+  assert.match(appHtml, /class="home-callout"/);
+  assert.match(appHtml, /id="asymptotic-tool"/);
+  assert.match(appHtml, /id="sorting-arena-tool"/);
+  assert.match(appHtml, /rota pedagógica recomendada/);
+  assert.match(appHtml, /modelo mental antes da manipulação/);
   assert.match(appHtml, /async function renderPracticeWorkspace\(preferredTopicId\)/);
+  assert.match(appHtml, /function analyzeAsymptoticTool\(\)/);
+  assert.match(appHtml, /function startSortingArena\(\)/);
+  assert.match(appHtml, /function buildArenaFrames\(base, algo\)/);
   assert.match(appHtml, /function scrollMainToTop\(\)/);
+  assert.match(appHtml, /function insertLearningPanel\(page, panel\) \{\s*page\.appendChild\(panel\);\s*\}/);
   assert.match(appHtml, /if\(pageId === 'exercicios'\) renderPracticeWorkspace\(\);[\s\S]*else renderSimulatorPanel\(pageId\);/);
   assert.match(appHtml, /content\.scrollTo\(\{ top: 0, left: 0, behavior: 'auto' \}\)/);
   assert.ok(appHtml.indexOf('id="ni-exercicios"') > appHtml.indexOf('id="grp-paradigmas"'));
+  assert.ok(appHtml.indexOf('id="asymptotic-tool"') < appHtml.indexOf('id="practice-required-host"'));
+});
+
+test('explicações didáticas cobrem assintótica, ordenação e Dijkstra', () => {
+  assert.match(appHtml, /ASYMPTOTIC_EXAMPLES/);
+  assert.match(appHtml, /O\(n log n\)/);
+  assert.match(appHtml, /O\(\(V \+ E\) log V\)/);
+  assert.match(appHtml, /Como chegamos em/);
+  assert.match(appHtml, /id="dijk-explain"/);
+  assert.match(appHtml, /function dijkExplainHtml\(step\)/);
+  assert.match(appHtml, /distância até/);
+  assert.match(appHtml, /arenaScore\(run\)/);
+});
+
+test('fundamentos têm narrativa comparativa e ganchos pedagógicos', () => {
+  assert.match(appHtml, /algoritmo não é só receita/);
+  assert.match(appHtml, /Heurística:/);
+  assert.match(appHtml, /Programa:/);
+  assert.match(appHtml, /qual algoritmo é o melhor\?/);
+  assert.match(appHtml, /tad, estrutura concreta e classe não são a mesma coisa/);
+  assert.match(appHtml, /O TAD é a promessa pública/);
+  assert.match(appHtml, /Use array quando:/);
+  assert.match(appHtml, /Cartões comparativos: leia lado a lado, não como etapas/);
+  assert.match(appHtml, /<div class="insight-icon">💡<\/div>/);
+  assert.match(appHtml, /<div class="insight-title">Próximo passo<\/div>/);
+  assert.doesNotMatch(appHtml, /Próxima deixa:/);
+  assert.doesNotMatch(appHtml, /Deixa para o próximo tópico:/);
+});
+
+test('análise de algoritmos explica critérios, comparações e armadilhas', () => {
+  assert.match(appHtml, /Analisar algoritmo é prever comportamento antes de rodar/);
+  assert.match(appHtml, /A receita mental/);
+  assert.match(appHtml, /Busca linear/);
+  assert.match(appHtml, /Busca binária/);
+  assert.match(appHtml, /Tabela hash/);
+  assert.match(appHtml, /Árvore balanceada/);
+  assert.match(appHtml, /Teorema Mestre sem mistério/);
+  assert.match(appHtml, /armadilhas comuns/);
+  assert.match(appHtml, /Cartões comparativos: escolha pelo contexto do problema/);
+  assert.match(appHtml, /Checklist de leitura: use como alertas de projeto/);
+});
+
+test('estruturas explicam política de acesso, origem e problema resolvido', () => {
+  assert.match(appHtml, /ordered-notes/);
+  assert.match(appHtml, /Leitura guiada: origem, acesso, ganho e limite/);
+  assert.match(appHtml, /Leitura guiada: problema, política, acesso e uso/);
+  assert.match(appHtml, /Por que arrays foram criados\?/);
+  assert.match(appHtml, /Política de acesso:<\/strong> acesso aleatório por índice/);
+  assert.match(appHtml, /Como o dado é alcançado:<\/strong> por endereço base mais deslocamento/);
+  assert.match(appHtml, /Política de acesso:<\/strong> acesso sequencial por nós/);
+  assert.match(appHtml, /Por que listas ligadas foram criadas\?/);
+  assert.match(appHtml, /Política de acesso:<\/strong> acesso restrito ao topo/);
+  assert.match(appHtml, /Política de acesso:<\/strong> insere atrás, remove na frente/);
+  assert.match(appHtml, /Política de acesso:<\/strong> comparação hierárquica/);
+  assert.match(appHtml, /Política de acesso:<\/strong> acesso prioritário à raiz/);
+  assert.match(appHtml, /Política de acesso:<\/strong> acesso por chave/);
+  assert.match(appHtml, /Política de acesso:<\/strong> acesso por adjacência/);
 });
 
 test('simuladores, recomendações, analytics e exercícios dinâmicos estão integrados à API', () => {

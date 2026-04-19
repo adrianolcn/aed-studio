@@ -224,11 +224,176 @@ html, body {
 .def .lbl { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--purple); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 6px; }
 .info { background: var(--bg1); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--r-md); padding: 16px 18px; font-size: 13px; color: var(--text1); line-height: 1.7; margin-bottom: 12px; }
 .warn { background: var(--bg1); border: 1px solid var(--border); border-left: 3px solid var(--amber); border-radius: var(--r-md); padding: 16px 18px; font-size: 13px; color: var(--text1); line-height: 1.7; margin-bottom: 12px; }
+.grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin: 18px 0; align-items: stretch; }
+.grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin: 18px 0; align-items: stretch; }
+.note {
+  position: relative;
+  min-width: 0;
+  background:
+    linear-gradient(135deg, rgba(88,166,255,.06), transparent 42%),
+    var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 18px 18px 18px 22px;
+  color: var(--text1);
+  font-size: 13px;
+  line-height: 1.72;
+  overflow: hidden;
+}
+.note::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--accent);
+  opacity: .85;
+}
+.note strong {
+  display: block;
+  margin-bottom: 10px;
+  padding-right: 36px;
+  color: var(--text0);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10.5px;
+  letter-spacing: .08em;
+  line-height: 1.45;
+  text-transform: uppercase;
+}
+.note code {
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent);
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+.note.green::before { background: var(--green); }
+.note.amber::before { background: var(--amber); }
+.note.purple::before { background: var(--purple); }
+.note.coral::before { background: var(--coral); }
+.ordered-notes { counter-reset: note-step; }
+.ordered-notes .note { counter-increment: note-step; }
+.ordered-notes .note::after {
+  content: counter(note-step, decimal-leading-zero);
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  font-weight: 700;
+  opacity: .42;
+}
+.sequence-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--text2);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .08em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.sequence-hint::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(88,166,255,.12);
+}
+.sequence-hint.compare::before {
+  background: var(--purple);
+  box-shadow: 0 0 0 4px rgba(188,140,255,.12);
+}
+.insight {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: linear-gradient(135deg, rgba(210,153,34,.14), transparent 45%), var(--bg1);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--amber);
+  border-radius: var(--r-md);
+  padding: 15px 17px;
+  color: var(--text1);
+  font-size: 13px;
+  line-height: 1.7;
+  margin-bottom: 12px;
+}
+.insight-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 50%;
+  background: rgba(210,153,34,.16);
+  border: 1px solid rgba(210,153,34,.38);
+  font-size: 16px;
+}
+.insight-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 3px;
+}
+.insight p { margin: 0; }
+.analysis-lab { display: grid; grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr); gap: 14px; align-items: stretch; margin-bottom: 14px; }
+.analysis-card {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  min-width: 0;
+}
+.analysis-card h3 {
+  color: var(--text0);
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.analysis-card p,
+.analysis-card li {
+  color: var(--text1);
+  font-size: 13px;
+  line-height: 1.75;
+}
+.analysis-card ul,
+.analysis-card ol { padding-left: 20px; }
+.analysis-card code {
+  font-family: 'IBM Plex Mono', monospace;
+  color: var(--accent);
+  background: var(--bg2);
+  border-radius: 5px;
+  padding: 1px 5px;
+}
+.case-card { border-left: 3px solid var(--accent); }
+.case-card.best { border-left-color: var(--green); }
+.case-card.average { border-left-color: var(--amber); }
+.case-card.worst { border-left-color: var(--coral); }
+.case-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.case-card.best .case-label { color: var(--green); }
+.case-card.average .case-label { color: var(--amber); }
+.case-card.worst .case-label { color: var(--coral); }
 
-.student-dashboard { display: grid; grid-template-columns: 1.1fr .9fr; gap: 12px; margin-bottom: 24px; }
-.edu-panel { background: var(--bg1); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
-.edu-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 14px; }
-.edu-kpi { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 10px; }
+.student-dashboard { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; margin-bottom: 30px; align-items: stretch; }
+.edu-panel { background: var(--bg1); border: 1px solid var(--border); border-radius: 8px; padding: 20px; min-width: 0; }
+.edu-kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.edu-kpi { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px; min-width: 0; }
 .edu-kpi-label { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--text2); text-transform: uppercase; letter-spacing: .08em; }
 .edu-kpi-value { font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--text0); margin-top: 4px; }
 .track-row { display: grid; grid-template-columns: 120px 1fr 48px; gap: 8px; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--border); }
@@ -249,7 +414,7 @@ html, body {
 .exercise-option:hover { border-color: var(--accent); color: var(--text0); }
 .exercise-feedback { margin-top: 10px; font-size: 12px; line-height: 1.6; color: var(--text1); }
 
-.expedition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px; }
+.expedition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 18px 0 32px; align-items: stretch; }
 .expedition-card { border: 1px solid var(--border); background: color-mix(in srgb, var(--bg2) 82%, var(--green) 18%); border-radius: 8px; padding: 12px; min-height: 86px; }
 .expedition-kicker { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
 .expedition-title { font-size: 13px; color: var(--text0); font-weight: 600; line-height: 1.35; }
@@ -261,6 +426,7 @@ html, body {
 .recommendation-list { display: grid; gap: 8px; margin-top: 10px; }
 .recommendation-item { border: 1px solid var(--border); border-left: 3px solid var(--accent); background: var(--bg2); border-radius: 8px; padding: 10px; }
 .recommendation-item.review { border-left-color: var(--amber); }
+.home-callout { margin-top: 0; }
 .recommendation-item .meta { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text2); text-transform: uppercase; margin-bottom: 4px; }
 .simulator-panel, .dynamic-exercise-panel { margin: 12px 0 18px; background: var(--bg1); border: 1px solid var(--border); border-left: 3px solid var(--teal); border-radius: 8px; padding: 14px; }
 .simulator-panel { border-left-color: var(--accent); }
@@ -271,10 +437,32 @@ html, body {
 .practice-tool-panel.dynamic { border-left: 3px solid var(--teal); }
 .practice-tool-panel.code { border-left: 3px solid var(--purple); }
 .practice-tool-panel.sim { border-left: 3px solid var(--accent); }
+.practice-tool-panel.asymptotic { border-left: 3px solid var(--amber); }
+.practice-tool-panel.sorting-game { border-left: 3px solid var(--coral); }
 .practice-tool-panel.full { grid-column: 1 / -1; }
 .practice-select-row { display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; margin-top:12px; }
 .practice-select-row label { display:flex; flex-direction:column; gap:6px; font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:.08em; }
 .practice-select-row select { background:var(--bg2); border:1px solid var(--border); color:var(--text0); border-radius:6px; padding:9px 10px; min-width:260px; font-family:'IBM Plex Mono',monospace; }
+.analysis-textarea { width: 100%; min-height: 210px; resize: vertical; background: var(--bg0); border: 1px solid var(--border); color: var(--text1); border-radius: 8px; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.7; }
+.analysis-result-grid { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr); gap: 12px; margin-top: 12px; }
+.complexity-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; min-width: 0; }
+.complexity-badge { display: inline-flex; align-items: center; justify-content: center; min-height: 42px; padding: 4px 14px; border-radius: 8px; background: rgba(88,166,255,.12); border: 1px solid rgba(88,166,255,.35); color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: 24px; font-weight: 700; }
+.analysis-steps { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.analysis-step { background: var(--bg1); border: 1px solid var(--border); border-radius: 6px; padding: 9px 10px; color: var(--text1); font-size: 12px; line-height: 1.7; }
+.arena-panels { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 12px; margin-top: 12px; }
+.arena-board { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; padding: 12px; min-width: 0; }
+.arena-bars { height: 180px; display: flex; align-items: flex-end; gap: 4px; padding: 10px; background: var(--bg0); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.arena-bar { flex: 1; min-width: 4px; background: #2f3a45; border: 1px solid #3d4651; border-radius: 4px 4px 0 0; transition: height .18s ease, background .18s ease, border-color .18s ease; }
+.arena-bar.compare { background: rgba(88,166,255,.28); border-color: var(--accent); }
+.arena-bar.swap { background: rgba(63,185,80,.28); border-color: var(--green); }
+.arena-bar.sorted { background: rgba(210,153,34,.22); border-color: var(--amber); }
+.arena-stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 6px; margin-top: 10px; }
+.arena-stat { background: var(--bg1); border: 1px solid var(--border); border-radius: 6px; padding: 8px; min-width: 0; }
+.arena-stat b { display: block; color: var(--text0); font-family: 'JetBrains Mono', monospace; font-size: 14px; }
+.arena-stat span { display: block; color: var(--text2); font-family: 'IBM Plex Mono', monospace; font-size: 9px; text-transform: uppercase; margin-top: 2px; }
+.dijkstra-explain { background: var(--bg2); border: 1px solid var(--border); border-left: 3px solid var(--amber); border-radius: 8px; padding: 12px; margin: 8px 0; color: var(--text1); font-size: 12px; line-height: 1.8; }
+.dijkstra-explain strong { color: var(--text0); }
+.dijkstra-explain code { font-family: 'IBM Plex Mono', monospace; color: var(--accent); background: var(--bg1); padding: 1px 5px; border-radius: 4px; }
 .simulator-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 10px 0; }
 .simulator-toolbar input, .simulator-toolbar select { background: var(--bg2); border: 1px solid var(--border); color: var(--text0); border-radius: 6px; padding: 8px 10px; min-width: 82px; }
 .simulator-toolbar button, .dynamic-exercise-panel button { border: 1px solid var(--border); background: var(--bg2); color: var(--text1); border-radius: 6px; padding: 8px 10px; cursor: pointer; }
@@ -603,6 +791,9 @@ canvas { display: block; width: 100%; }
   .def,
   .info,
   .warn,
+  .insight,
+  .note,
+  .analysis-card,
   .qc,
   .cb,
   .module-card,
@@ -615,10 +806,24 @@ canvas { display: block; width: 100%; }
   .def,
   .info,
   .warn,
+  .insight,
+  .note,
   .qc,
   .module-card {
     padding-left: 14px;
     padding-right: 14px;
+  }
+  .note { padding-left: 18px; }
+  .grid2,
+  .grid3,
+  .analysis-lab {
+    grid-template-columns: 1fr !important;
+  }
+  .insight { gap: 10px; }
+  .insight-icon {
+    width: 28px;
+    height: 28px;
+    flex-basis: 28px;
   }
   .ph div[style*="max-width"] {
     max-width: 100% !important;
@@ -820,9 +1025,12 @@ canvas { display: block; width: 100%; }
   .track-row,
   .expedition-grid,
   .analytics-grid,
+  .analysis-result-grid,
+  .arena-panels,
   .practice-tools-grid {
     grid-template-columns: 1fr;
   }
+  .arena-stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .practice-tool-panel.full { grid-column: auto; }
   .practice-select-row select { min-width: 0; width: 100%; }
   .track-row { gap: 6px; }
@@ -1154,7 +1362,7 @@ canvas { display: block; width: 100%; }
   </div>
 
   <!-- big idea strip -->
-  <div style="background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:18px;margin-bottom:24px">
+  <div class="home-callout" style="background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:8px;padding:18px;margin-bottom:24px">
     <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">// por onde começar?</div>
     <div class="home-intro-text" style="font-size:13px;color:var(--text1);line-height:1.9;max-width:700px">
       Todo o edifício desta plataforma repousa sobre uma pergunta simples:
@@ -1267,7 +1475,92 @@ canvas { display: block; width: 100%; }
     </div>
   </div>
 
+  <div class="sec">
+    <div class="sectitle">// rota pedagógica recomendada</div>
+    <div class="def">
+      <div class="lbl">modelo mental antes da manipulação</div>
+      A prática rende mais quando a ordem é respeitada: primeiro leia a definição, os casos de uso, invariantes e custos do tópico; depois analise a complexidade; em seguida manipule estruturas e, por fim, resolva desafios avaliativos. Esta estação concentra as ferramentas, mas a teoria de cada tópico continua sendo o ponto de partida.
+    </div>
+    <div class="sequence-hint">Leitura guiada: siga os cartões numerados</div>
+    <div class="grid2 ordered-notes">
+      <div class="note"><strong>Entender</strong> consulte a teoria do tópico e identifique qual problema a estrutura ou algoritmo resolve.</div>
+      <div class="note"><strong>Analisar</strong> use o analisador para justificar o custo assintótico antes de medir ou comparar.</div>
+      <div class="note"><strong>Manipular</strong> explore simuladores e arenas para enxergar invariantes, comparações, trocas e caminhos.</div>
+      <div class="note"><strong>Validar</strong> finalize com quiz, exercício dinâmico e código corrigido pelo servidor.</div>
+    </div>
+  </div>
+
   <div class="practice-tools-grid">
+    <div class="practice-tool-panel asymptotic full" id="asymptotic-tool">
+      <div class="expedition-kicker">// analisador assintótico</div>
+      <div class="expedition-title">Cole um algoritmo, escolha um modelo ou compare ideias</div>
+      <div class="expedition-copy">A análise é didática e local: identifica operação dominante, estrutura de repetição, recorrência provável e explica como chegar ao Big-O. Para código real de produção, valide também com benchmarks e revisão humana.</div>
+      <div class="practice-select-row">
+        <label for="asymptotic-template">
+          modelo
+          <select id="asymptotic-template" onchange="loadAsymptoticExample()">
+            <option value="linearSearch">Busca linear</option>
+            <option value="binarySearch">Busca binária</option>
+            <option value="nestedLoops">Dois laços aninhados</option>
+            <option value="mergeSort">Merge Sort</option>
+            <option value="quickSort">Quick Sort</option>
+            <option value="dijkstra">Dijkstra com fila de prioridade</option>
+            <option value="hashLookup">Consulta em tabela hash</option>
+            <option value="custom">Código colado pelo aluno</option>
+          </select>
+        </label>
+        <button class="btn primary" type="button" onclick="analyzeAsymptoticTool()">analisar complexidade</button>
+      </div>
+      <textarea id="asymptotic-code" class="analysis-textarea" spellcheck="false" aria-label="Código para análise assintótica"></textarea>
+      <div id="asymptotic-result" class="analysis-result-grid"></div>
+    </div>
+    <div class="practice-tool-panel sorting-game full" id="sorting-arena-tool">
+      <div class="expedition-kicker">// sorting arena</div>
+      <div class="expedition-title">Competição visual de algoritmos de ordenação</div>
+      <div class="expedition-copy">Dois algoritmos recebem o mesmo array. A pontuação considera comparações, trocas/movimentos e passos. Use para enxergar, não só decorar, por que estratégias diferentes crescem de formas diferentes.</div>
+      <div class="practice-select-row">
+        <label for="arena-left-algo">
+          algoritmo A
+          <select id="arena-left-algo">
+            <option value="bubble">Bubble Sort</option>
+            <option value="insertion">Insertion Sort</option>
+            <option value="selection">Selection Sort</option>
+            <option value="merge">Merge Sort</option>
+            <option value="quick">Quick Sort</option>
+          </select>
+        </label>
+        <label for="arena-right-algo">
+          algoritmo B
+          <select id="arena-right-algo">
+            <option value="quick">Quick Sort</option>
+            <option value="merge">Merge Sort</option>
+            <option value="insertion">Insertion Sort</option>
+            <option value="selection">Selection Sort</option>
+            <option value="bubble">Bubble Sort</option>
+          </select>
+        </label>
+        <label for="arena-size">
+          tamanho
+          <select id="arena-size">
+            <option value="10">10 valores</option>
+            <option value="14" selected>14 valores</option>
+            <option value="18">18 valores</option>
+            <option value="24">24 valores</option>
+          </select>
+        </label>
+        <button class="btn primary" type="button" onclick="startSortingArena()">iniciar arena</button>
+        <button class="btn" type="button" onclick="pauseSortingArena()">pausar</button>
+        <button class="btn" type="button" onclick="resetSortingArena()">novo array</button>
+      </div>
+      <div id="arena-summary" class="expedition-copy" style="margin-top:10px">Gere um array e inicie a competição.</div>
+      <div class="arena-panels">
+        <div class="arena-board" id="arena-left"></div>
+        <div class="arena-board" id="arena-right"></div>
+      </div>
+    </div>
+    <div class="practice-tool-panel sim full" id="practice-simulator-host">
+      <div class="expedition-copy">Selecione um tópico para carregar o simulador disponível depois de revisar a teoria.</div>
+    </div>
     <div class="practice-tool-panel required" id="practice-required-host">
       <div class="expedition-copy">Selecione um tópico para carregar o quiz obrigatório.</div>
     </div>
@@ -1276,9 +1569,6 @@ canvas { display: block; width: 100%; }
     </div>
     <div class="practice-tool-panel code full" id="practice-code-host">
       <div class="expedition-copy">Selecione um tópico para carregar o testador de código.</div>
-    </div>
-    <div class="practice-tool-panel sim full" id="practice-simulator-host">
-      <div class="expedition-copy">Selecione um tópico para carregar o simulador disponível.</div>
     </div>
   </div>
 </div>
@@ -1304,6 +1594,24 @@ canvas { display: block; width: 100%; }
     </div>
     <div class="info">
       <strong style="color:var(--text0)">Analogia:</strong> um músico pode saber teoria harmônica avançada, contraponto e orquestração. Mas se nunca parou para entender o que é <em>som</em> — uma oscilação de pressão no ar com frequência e amplitude —, toda aquela teoria paira no vazio. Algoritmos são para esta plataforma o que o som é para a música: a matéria-prima fundamental.
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sectitle">// 01.1 · algoritmo não é só receita</div>
+    <div class="def">
+      <div class="lbl">o que diferencia um algoritmo de uma instrução comum?</div>
+      É comum dizer que algoritmo é uma "receita". A comparação ajuda, mas também pode enganar. Uma receita de bolo aceita improvisos: "asse até dourar", "adicione sal a gosto", "misture bem". Um algoritmo, em ciência da computação, precisa ser mais rigoroso: cada passo deve ser executável, a entrada precisa estar clara, a saída esperada precisa ser definida e deve haver um critério para dizer se o resultado está correto.
+    </div>
+    <div class="sequence-hint compare">Cartões comparativos: leia lado a lado, não como etapas</div>
+    <div class="grid2">
+      <div class="note"><strong>Receita humana:</strong> tolera interpretação, contexto e experiência. Duas pessoas podem executar de modos ligeiramente diferentes e ainda chegar a algo aceitável.</div>
+      <div class="note"><strong>Algoritmo computacional:</strong> exige precisão. Se duas execuções com a mesma entrada produzem resultados incompatíveis sem motivo previsto, há um problema de especificação.</div>
+      <div class="note"><strong>Heurística:</strong> busca uma solução boa quando a ótima é cara demais. É útil, mas nem sempre garante a melhor resposta.</div>
+      <div class="note"><strong>Programa:</strong> é uma implementação concreta de um ou mais algoritmos, escrita em uma linguagem, rodando sobre dados reais e limitações reais de máquina.</div>
+    </div>
+    <div class="info" style="border-left-color:var(--green)">
+      <strong style="color:var(--text0)">Exemplo de escolha:</strong> para procurar um nome numa lista pequena, uma busca linear é simples e suficiente. Para procurar em milhões de registros ordenados, busca binária faz muito mais sentido. Para procurar por uma chave em um sistema que muda o tempo todo, uma tabela hash pode ser melhor. A pergunta não é "qual algoritmo é o melhor?", mas "melhor para quais dados, restrições e operações?".
     </div>
   </div>
 
@@ -1392,7 +1700,7 @@ canvas { display: block; width: 100%; }
           Um algoritmo é <strong>uma sequência finita de passos bem-definidos</strong> para resolver um problema ou realizar uma tarefa.
         </div>
         <div style="font-size:11px;color:var(--text2);line-height:1.7">
-          É o ponto de partida didático. Suffice para explicar a uma criança como amarrar o tênis. Não suffice para provar que um programa está correto, porque não especifica o que significa "bem-definido", nem quem ou o quê executa os passos.
+          É o ponto de partida didático. Basta para explicar a uma criança como amarrar o tênis. Não basta para provar que um programa está correto, porque não especifica o que significa "bem-definido", nem quem ou o quê executa os passos.
         </div>
       </div>
     </div>
@@ -1534,6 +1842,16 @@ canvas { display: block; width: 100%; }
         </tbody>
       </table>
     </div>
+    <div class="info" style="border-left-color:var(--teal);margin-top:14px">
+      <strong style="color:var(--text0)">Como decidir na prática:</strong> se você precisa de acesso direto por posição, arrays tendem a vencer. Se precisa inserir e remover muito no início ou no meio, listas ligadas podem evitar deslocamentos, embora paguem com pior localidade de cache. Se precisa sempre pegar o menor ou maior elemento, heap é mais adequado que ordenar tudo repetidamente. Se precisa responder "este elemento existe?" muitas vezes, uma tabela hash costuma ser melhor que uma busca linear. Estruturas diferentes tornam baratas operações diferentes.
+    </div>
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <div class="insight-title">Próximo passo</div>
+        <p>Se algoritmo e estrutura vivem juntos, precisamos de uma forma de falar das operações esperadas sem amarrar o aluno a uma implementação específica. É exatamente isso que o TAD faz: ele separa o contrato ("o que deve acontecer") da representação interna ("como acontece").</p>
+      </div>
+    </div>
   </div>
 
   <!-- ── 05 · De onde vem o TAD? ── -->
@@ -1661,6 +1979,25 @@ canvas { display: block; width: 100%; }
     </div>
   </div>
 
+  <div class="sec">
+    <div class="sectitle">// 01.1 · tad, estrutura concreta e classe não são a mesma coisa</div>
+    <div class="def">
+      <div class="lbl">a confusão mais comum</div>
+      O estudante costuma misturar três camadas: o TAD, a estrutura de dados concreta e a classe escrita em Java. Elas conversam, mas não são sinônimos. O TAD é a promessa pública; a estrutura concreta é a estratégia de armazenamento; a classe é uma implementação específica dessa estratégia numa linguagem.
+    </div>
+    <table class="ctable">
+      <thead><tr><th>Camada</th><th>Pergunta que responde</th><th>Exemplo</th><th>Por que importa</th></tr></thead>
+      <tbody>
+        <tr><td>TAD</td><td>Quais operações existem e quais regras obedecem?</td><td style="color:var(--text1)">Stack: push, pop, peek</td><td style="color:var(--text2)">Permite raciocinar sem depender da implementação.</td></tr>
+        <tr><td>Estrutura concreta</td><td>Como os dados ficam organizados na memória?</td><td style="color:var(--text1)">Array dinâmico ou lista ligada</td><td style="color:var(--text2)">Determina custos, limites e comportamento prático.</td></tr>
+        <tr><td>Classe Java</td><td>Como isso foi codificado nesta linguagem?</td><td style="color:var(--text1)">ArrayDeque, LinkedList, ArrayStack</td><td style="color:var(--text2)">Expõe a API real que o programa usa.</td></tr>
+      </tbody>
+    </table>
+    <div class="info" style="border-left-color:var(--amber)">
+      <strong style="color:var(--text0)">Exemplo de escolha:</strong> uma pilha usada para desfazer ações num editor de texto pode ser implementada com array dinâmico, porque push/pop no topo são rápidos e há boa localidade de memória. Uma fila de eventos com muitas remoções no início pode pedir outra estratégia, como buffer circular. O TAD diz o contrato; a implementação decide o custo.
+    </div>
+  </div>
+
   <!-- 02 · Dois pilares -->
   <div class="sec">
     <div class="sectitle">// 02 · os dois pilares de todo TAD</div>
@@ -1676,6 +2013,9 @@ canvas { display: block; width: 100%; }
     </div>
     <div class="warn">
       <strong style="color:var(--text0)">O terceiro elemento: axiomas.</strong> Além de dados e operações, um TAD formal inclui <em>axiomas</em> — regras algébricas que as operações devem sempre satisfazer, independente de implementação. Ex: <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);background:var(--bg2);padding:1px 5px;border-radius:4px">pop(push(s, x)) = s</code> é um axioma da pilha. Ele é verdadeiro para array, lista ligada, ou qualquer outra implementação.
+    </div>
+    <div class="info" style="border-left-color:var(--green)">
+      <strong style="color:var(--text0)">Ponte para estruturas lineares:</strong> depois que você entende o contrato, fica mais fácil comparar implementações. Uma pilha pode ser "a mesma pilha" para quem usa, mas custar diferente por dentro. O próximo bloco da plataforma começa justamente pela família mais direta de representações: arrays, listas, pilhas e filas. Elas são o primeiro laboratório para perceber que interface e custo não são a mesma coisa.
     </div>
   </div>
 
@@ -1958,41 +2298,94 @@ player.<span class="fn">next</span>();
   </div>
 
   <div class="sec">
-    <div class="sectitle">// 01 · três casos de análise</div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
-      <div style="background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--green);padding:13px">
-        <div style="font-size:10px;color:var(--green);font-family:'IBM Plex Mono',monospace;margin-bottom:6px;letter-spacing:.06em">MELHOR CASO</div>
-        <div style="font-size:12px;color:var(--text1);line-height:1.6">Entrada mais favorável. Define Ω. Ex: busca linear com elemento na posição 0 → O(1).</div>
+    <div class="sectitle">// 01 · o que a análise realmente mede</div>
+    <div class="analysis-lab">
+      <div class="analysis-card">
+        <h3>Analisar algoritmo é prever comportamento antes de rodar</h3>
+        <p>Quando você pergunta "isso é rápido?", a resposta honesta é: depende do tamanho da entrada, da operação dominante e da estrutura de dados escolhida. A análise assintótica troca o cronômetro por uma lupa: em vez de medir uma máquina específica, ela descreve como o custo cresce quando <code>n</code> aumenta.</p>
+        <p>Por isso ela não substitui benchmark. Ela responde outra pergunta: se a entrada dobrar, o trabalho cresce pouco, cresce em linha reta, explode quadraticamente ou fica quase parado?</p>
       </div>
-      <div style="background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--amber);padding:13px">
-        <div style="font-size:10px;color:var(--amber);font-family:'IBM Plex Mono',monospace;margin-bottom:6px;letter-spacing:.06em">CASO MÉDIO</div>
-        <div style="font-size:12px;color:var(--text1);line-height:1.6">Média sobre todas as entradas possíveis. Requer análise probabilística. Ex: busca linear → n/2 comparações → O(n).</div>
+      <div class="analysis-card">
+        <h3>A receita mental</h3>
+        <ol>
+          <li>Defina o que é <code>n</code>: quantidade de elementos, vértices, arestas, caracteres ou chamadas.</li>
+          <li>Escolha a operação que domina o custo: comparação, troca, acesso, chamada recursiva ou visita.</li>
+          <li>Conte quantas vezes ela acontece no pior caso relevante.</li>
+          <li>Descarte constantes e termos menores: <code>3n² + 7n + 42</code> vira <code>O(n²)</code>.</li>
+          <li>Interprete: complexidade é uma pista de projeto, não um troféu isolado.</li>
+        </ol>
       </div>
-      <div style="background:var(--bg1);border:1px solid var(--border);border-left:3px solid var(--coral);padding:13px">
-        <div style="font-size:10px;color:var(--coral);font-family:'IBM Plex Mono',monospace;margin-bottom:6px;letter-spacing:.06em">PIOR CASO</div>
-        <div style="font-size:12px;color:var(--text1);line-height:1.6">O mais usado na prática — garante um teto de desempenho. Define O. Ex: busca linear com elemento ausente → n comparações.</div>
+    </div>
+    <div class="grid3">
+      <div class="analysis-card case-card best">
+        <div class="case-label">Melhor caso · Ω</div>
+        <p>Entrada mais favorável. Na busca linear, se o elemento está na primeira posição, há uma comparação: <code>Ω(1)</code>. É útil para entender potencial, mas raramente basta para garantir qualidade.</p>
+      </div>
+      <div class="analysis-card case-card average">
+        <div class="case-label">Caso médio</div>
+        <p>Comportamento esperado sob uma distribuição de entradas. Busca linear costuma achar o item no meio: cerca de <code>n/2</code> comparações, ainda <code>O(n)</code>. Exige cuidado probabilístico.</p>
+      </div>
+      <div class="analysis-card case-card worst">
+        <div class="case-label">Pior caso · O</div>
+        <p>O teto de custo. Se o item não existe, a busca linear olha tudo: <code>n</code> comparações. É a visão preferida quando o sistema precisa prometer desempenho previsível.</p>
       </div>
     </div>
   </div>
 
   <div class="sec">
-    <div class="sectitle">// 02 · Teorema Mestre — resumo</div>
+    <div class="sectitle">// 02 · comparando escolhas reais</div>
+    <div class="sequence-hint compare">Cartões comparativos: escolha pelo contexto do problema</div>
+    <div class="grid2">
+      <div class="note green"><strong>Busca linear</strong> Funciona em dados desordenados e é simples. Boa para listas pequenas, uma única consulta ou quando ordenar custaria mais que procurar.</div>
+      <div class="note"><strong>Busca binária</strong> Exige dados ordenados e acesso por índice. Em arrays, corta o espaço pela metade a cada passo: <code>O(log n)</code>. Em lista ligada, perde força porque chegar ao meio custa caro.</div>
+      <div class="note purple"><strong>Tabela hash</strong> Troca ordenação por acesso por chave. No caso médio, busca é <code>O(1)</code>; no pior, colisões ruins podem degradar. É ótima para dicionários, caches e cadastros.</div>
+      <div class="note amber"><strong>Árvore balanceada</strong> Mantém ordem e busca previsível: <code>O(log n)</code>. Serve quando você precisa inserir, remover e ainda percorrer em ordem sem reordenar tudo.</div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <div class="insight-title">Leitura de projeto</div>
+        <p>Não existe "melhor algoritmo" fora do contexto. Se você consulta muito e muda pouco, ordenar e usar busca binária pode valer. Se consulta por chave o tempo todo, hash costuma vencer. Se precisa manter ordem enquanto insere, árvore balanceada entra em cena.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sectitle">// 03 · Teorema Mestre sem mistério</div>
     <div class="def"><div class="lbl">para T(n) = a·T(n/b) + f(n), onde a ≥ 1, b &gt; 1</div>
-      Compare f(n) com n^(log_b a):<br>
-      <strong style="color:var(--purple)">Caso 1:</strong> f(n) = O(n^(log_b a − ε)) → T(n) = Θ(n^log_b a) &nbsp;&nbsp;|&nbsp;&nbsp; <strong style="color:var(--accent)">Caso 2:</strong> f(n) = Θ(n^log_b a) → T(n) = Θ(n^log_b a · log n) &nbsp;&nbsp;|&nbsp;&nbsp; <strong style="color:var(--amber)">Caso 3:</strong> f(n) = Ω(n^(log_b a + ε)) → T(n) = Θ(f(n))
+      O Teorema Mestre aparece quando um algoritmo divide o problema em subproblemas menores. Ele pergunta quem pesa mais: o trabalho das chamadas recursivas ou o trabalho feito fora delas.<br>
+      <strong style="color:var(--purple)">Caso 1:</strong> as chamadas dominam → T(n) = Θ(n^log_b a) &nbsp;&nbsp;|&nbsp;&nbsp; <strong style="color:var(--accent)">Caso 2:</strong> há equilíbrio → T(n) = Θ(n^log_b a · log n) &nbsp;&nbsp;|&nbsp;&nbsp; <strong style="color:var(--amber)">Caso 3:</strong> o trabalho externo domina → T(n) = Θ(f(n))
     </div>
     <table class="ctable">
-      <thead><tr><th>Algoritmo</th><th>Recorrência</th><th>Caso</th><th>Resultado</th></tr></thead>
+      <thead><tr><th>Algoritmo</th><th>Recorrência</th><th>Como ler</th><th>Resultado</th></tr></thead>
       <tbody>
-        <tr><td>Merge Sort</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text1)">T(n)=2T(n/2)+Θ(n)</td><td style="color:var(--accent)">Caso 2</td><td class="good">Θ(n log n)</td></tr>
-        <tr><td>Busca Binária</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text1)">T(n)=T(n/2)+Θ(1)</td><td style="color:var(--accent)">Caso 2</td><td class="good">Θ(log n)</td></tr>
-        <tr><td>Strassen</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text1)">T(n)=7T(n/2)+Θ(n²)</td><td style="color:var(--purple)">Caso 1</td><td class="mid">Θ(n^2.807)</td></tr>
+        <tr><td>Merge Sort</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text1)">T(n)=2T(n/2)+Θ(n)</td><td>divide em duas metades e junta tudo</td><td class="good">Θ(n log n)</td></tr>
+        <tr><td>Busca Binária</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text1)">T(n)=T(n/2)+Θ(1)</td><td>mantém só uma metade e descarta a outra</td><td class="good">Θ(log n)</td></tr>
+        <tr><td>Strassen</td><td style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text1)">T(n)=7T(n/2)+Θ(n²)</td><td>reduz multiplicações de matrizes</td><td class="mid">Θ(n^2.807)</td></tr>
       </tbody>
     </table>
   </div>
 
   <div class="sec">
-    <div class="sectitle">// quiz</div>
+    <div class="sectitle">// 04 · armadilhas comuns</div>
+    <div class="sequence-hint compare">Checklist de leitura: use como alertas de projeto</div>
+    <div class="grid2">
+      <div class="note coral"><strong>Confundir rápido com escalável</strong> Um algoritmo <code>O(n²)</code> pode parecer ótimo em 20 itens e desabar em 200 mil. Assintótica revela essa curva antes do susto.</div>
+      <div class="note amber"><strong>Ignorar espaço</strong> Merge Sort é previsível, mas usa memória extra. Quick Sort costuma ser econômico em memória, mas pode ter pior caso ruim se o pivô for escolhido mal.</div>
+      <div class="note"><strong>Esquecer a estrutura de dados</strong> O mesmo algoritmo muda de custo quando troca array por lista ligada. Busca binária precisa saltar para o meio; lista ligada não sabe fazer isso barato.</div>
+      <div class="note green"><strong>Usar Big-O como ranking absoluto</strong> <code>O(log n)</code> não vence sempre se a constante, o cache, a entrada e o custo de preparar os dados forem desfavoráveis. A análise orienta; o contexto decide.</div>
+    </div>
+    <div class="insight">
+      <div class="insight-icon">💡</div>
+      <div>
+        <div class="insight-title">Próximo passo</div>
+        <p>Agora que você sabe medir custo, as estruturas lineares ficam mais interessantes: arrays, pilhas, filas e listas não são só "jeitos de guardar dados"; cada uma impõe uma política de acesso que muda o algoritmo possível.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sectitle">// 05 · quiz</div>
     <div class="qc">
       <div class="qq">A recorrência T(n) = 2T(n/4) + Θ(√n). Qual o resultado pelo Teorema Mestre?</div>
       <div class="qopts">
@@ -2028,6 +2421,30 @@ player.<span class="fn">next</span>();
       <div class="sectitle">// 01 · memória contígua</div>
       <div class="def"><div class="lbl">definição</div>Um array armazena elementos em posições de memória <strong>contíguas</strong>. O acesso a qualquer elemento é O(1) pelo cálculo: <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent);background:var(--bg2);padding:1px 5px;border-radius:4px">addr(i) = base + i × sizeof(T)</code></div>
       <div class="info"><strong style="color:var(--text0)">Analogia:</strong> caixas postais numeradas num prédio. Para acessar a caixa 47, você vai diretamente — não precisa abrir as anteriores. Custo sempre O(1). Mas inserir uma nova caixa no meio exige mover todas as posteriores.</div>
+      <div class="info" style="border-left-color:var(--accent)">
+        <strong style="color:var(--text0)">Por que arrays foram criados?</strong> O problema original era representar uma coleção homogênea de valores sem criar uma variável para cada item. Em computação numérica, tabelas, matrizes, buffers e memória de baixo nível, era preciso dizer: "guarde muitos elementos do mesmo tipo em sequência e me deixe acessar qualquer posição rapidamente". O array resolveu isso de forma excelente: transforma índice em endereço por aritmética simples.
+      </div>
+      <div class="sequence-hint">Leitura guiada: origem, acesso, ganho e limite</div>
+      <div class="grid2 ordered-notes">
+        <div class="note"><strong>Política de acesso:</strong> acesso aleatório por índice. Você pede <code>arr[i]</code> e a máquina calcula diretamente onde o elemento está.</div>
+        <div class="note"><strong>Como o dado é alcançado:</strong> por endereço base mais deslocamento: <code>base + i * tamanho</code>. Não há nós, links ou busca estrutural.</div>
+        <div class="note"><strong>O que resolveu bem:</strong> leitura rápida, iteração cache-friendly, matrizes, vetores, ordenação, busca binária em dados ordenados e representação compacta.</div>
+        <div class="note"><strong>O que não resolveu:</strong> crescimento flexível e inserção no meio. Para manter continuidade, elementos precisam ser deslocados.</div>
+      </div>
+      <div class="sequence-hint">Leitura guiada: decisão de uso e trade-offs</div>
+      <div class="grid2 ordered-notes">
+        <div class="note"><strong>Use array quando:</strong> o tamanho é conhecido ou cresce pouco, o acesso por índice é frequente e você percorre os dados muitas vezes. É o caso de vetores numéricos, tabelas compactas, buffers e algoritmos de ordenação.</div>
+        <div class="note"><strong>Evite array puro quando:</strong> você precisa inserir/remover no meio com frequência. Cada deslocamento pode custar O(n), porque os elementos precisam continuar contíguos.</div>
+        <div class="note"><strong>ArrayList resolve parte do problema:</strong> cresce dinamicamente e mantém acesso O(1), mas ainda paga caro para inserir no meio. Ele melhora conveniência, não muda a natureza contígua.</div>
+        <div class="note"><strong>Lista ligada resolve outro problema:</strong> inserir/remover depois de um nó conhecido pode ser O(1), mas buscar o nó custa O(n) e a localidade de cache é pior. Não existe almoço grátis.</div>
+      </div>
+      <div class="insight">
+        <div class="insight-icon">💡</div>
+        <div>
+          <div class="insight-title">Próximo passo</div>
+          <p>Arrays ensinam acesso direto; pilhas e filas ensinam disciplina de acesso. Em vez de permitir qualquer índice, elas restringem as operações para ganhar clareza: LIFO na pilha, FIFO na fila.</p>
+        </div>
+      </div>
     </div>
     <div class="sec">
       <div class="sectitle">// 02 · visualizador — acesso direto</div>
@@ -2155,12 +2572,26 @@ player.<span class="fn">next</span>();
     <div class="sectitle">// 01 · pilha LIFO</div>
     <div class="def"><div class="lbl">Last In, First Out</div>Uma pilha restringe inserção e remoção a uma única extremidade chamada <em>topo</em>. O último elemento inserido é sempre o primeiro a sair.</div>
     <div class="info"><strong style="color:var(--text0)">Analogia:</strong> pilha de pratos. Você sempre coloca e retira do topo. A call stack do Java funciona exatamente assim — cada chamada empilha um frame, cada retorno o desempilha. StackOverflowError ocorre quando a pilha excede o limite de frames.</div>
+    <div class="sequence-hint">Leitura guiada: problema, política, acesso e uso</div>
+    <div class="grid2 ordered-notes">
+      <div class="note"><strong>Problema que motivou:</strong> controlar processos reversíveis: chamadas de função, desfazer ações, parsing de parênteses, backtracking e navegação por histórico.</div>
+      <div class="note"><strong>Política de acesso:</strong> acesso restrito ao topo. Não se percorre a pilha para escolher qualquer elemento; a disciplina é justamente remover o mais recente.</div>
+      <div class="note"><strong>Como o dado é acessado:</strong> por ponteiro/índice de topo. Em array, <code>top</code> aponta para a última posição ocupada; em lista, <code>head</code> é o topo.</div>
+      <div class="note"><strong>Quando usar:</strong> quando o último evento precisa ser resolvido primeiro. Se a ordem correta é "primeiro que chegou, primeiro atendido", use fila.</div>
+    </div>
   </div>
 
   <div class="sec">
     <div class="sectitle">// 02 · fila FIFO</div>
     <div class="def"><div class="lbl">First In, First Out</div>Uma fila insere no fim (enqueue) e remove do início (dequeue). O primeiro a entrar é o primeiro a sair.</div>
     <div class="info"><strong style="color:var(--text0)">Analogia:</strong> fila de supermercado. Quem chega primeiro é atendido primeiro. BFS usa uma fila exatamente por esse motivo — explora todos os vizinhos a distância 1 antes de ir para distância 2, processando nós na ordem de descoberta.</div>
+    <div class="sequence-hint">Leitura guiada: problema, política, acesso e limite</div>
+    <div class="grid2 ordered-notes">
+      <div class="note"><strong>Problema que motivou:</strong> organizar atendimento justo e processamento por ordem de chegada: tarefas, pacotes de rede, eventos de interface e níveis em BFS.</div>
+      <div class="note"><strong>Política de acesso:</strong> insere atrás, remove na frente. A estrutura impede "furar fila" porque isso quebraria a semântica FIFO.</div>
+      <div class="note"><strong>Como o dado é acessado:</strong> por dois marcadores: <code>front</code> para remover e <code>rear</code> para inserir. Em array eficiente, usa-se buffer circular.</div>
+      <div class="note"><strong>Quando evitar:</strong> se você precisa buscar o maior, menor ou mais urgente, fila simples não basta. A próxima variação natural é fila de prioridade, normalmente baseada em heap.</div>
+    </div>
   </div>
 
   <div class="sec">
@@ -2235,6 +2666,16 @@ deque.addLast(<span class="num">2</span>);         <span class="cm">// O(1) amor
       <div class="sectitle">// 01 · nós e ponteiros</div>
       <div class="def"><div class="lbl">definição</div>Uma lista ligada é uma sequência de <strong>nós</strong>, onde cada nó contém um valor e um ponteiro para o próximo nó. Os nós podem estar em posições de memória não-contíguas — eles se encontram pelos ponteiros.</div>
       <div class="info"><strong style="color:var(--text0)">Analogia:</strong> caça ao tesouro. Cada pista (nó) diz onde encontrar a próxima. Para chegar à pista 47, você tem que seguir toda a cadeia a partir do início — não há como ir diretamente: O(n). Em compensação, inserir uma nova pista no meio exige apenas atualizar dois ponteiros — O(1) se você já tem o nó anterior.</div>
+      <div class="info" style="border-left-color:var(--amber)">
+        <strong style="color:var(--text0)">Por que listas ligadas foram criadas?</strong> Arrays exigem blocos contíguos e sofrem para inserir/remover no meio. Em sistemas onde a memória pode estar fragmentada ou onde o tamanho da coleção muda muito, a lista ligada oferece outra ideia: cada elemento carrega o endereço do próximo. Ela resolveu bem crescimento flexível e edição local, mas pagou com perda de acesso direto.
+      </div>
+      <div class="sequence-hint">Leitura guiada: origem, acesso, ganho e limite</div>
+      <div class="grid2 ordered-notes">
+        <div class="note"><strong>Política de acesso:</strong> acesso sequencial por nós. Para chegar ao elemento i, você começa em <code>head</code> e segue <code>next</code> i vezes.</div>
+        <div class="note"><strong>Como o dado é acessado:</strong> por referência, não por índice real. O índice é uma contagem durante a travessia; ele não vira endereço direto como no array.</div>
+        <div class="note"><strong>O que resolveu bem:</strong> inserção/remoção no início, filas com ponteiros, estruturas encadeadas, listas intrusivas em sistemas e histórico com avanço/retorno.</div>
+        <div class="note"><strong>O que não resolveu:</strong> busca aleatória. Pedir "me dê o 47º" custa percorrer 46 links antes. Além disso, cada nó tem overhead de ponteiro e pior cache.</div>
+      </div>
     </div>
     <div class="sec">
       <div class="sectitle">// 02 · simulador — lista simples</div>
@@ -2379,6 +2820,13 @@ deque.addLast(<span class="num">2</span>);         <span class="cm">// O(1) amor
     <div class="sectitle">// 01 · invariante</div>
     <div class="def"><div class="lbl">invariante da BST</div>Para todo nó N: todos os valores na subárvore <em>esquerda</em> são <strong>menores</strong> que N, e todos na subárvore <em>direita</em> são <strong>maiores</strong>. Essa propriedade vale recursivamente para cada nó da árvore toda.</div>
     <div class="info"><strong style="color:var(--text0)">Analogia:</strong> a BST é a busca binária em forma de árvore. Cada nó "dobra o papel" e descarta metade do espaço restante. A invariante garante que a estrutura já está sempre "pré-ordenada", então cada busca aproveita isso para descer O(log n) níveis — sem precisar organizar nada antes.</div>
+    <div class="sequence-hint">Leitura guiada: problema, política, acesso e consequência</div>
+    <div class="grid2 ordered-notes">
+      <div class="note"><strong>Problema que motivou:</strong> manter uma coleção ordenável com inserções e buscas mais rápidas que varrer uma lista inteira.</div>
+      <div class="note"><strong>Política de acesso:</strong> comparação hierárquica. Em cada nó, decide-se ir para a esquerda ou direita; não existe acesso por índice.</div>
+      <div class="note"><strong>Como o dado é acessado:</strong> por caminho da raiz até o nó. O custo depende da altura da árvore, não diretamente da quantidade de elementos.</div>
+      <div class="note"><strong>Resolveu?</strong> sim, quando a árvore está razoavelmente balanceada. Quando os dados chegam ordenados, ela degenera e perde a vantagem.</div>
+    </div>
     <div class="warn"><strong style="color:var(--text0)">Degeneração:</strong> inserindo elementos em ordem crescente (1, 2, 3, 4…), a BST vira uma lista ligada com altura n e O(n) por operação. AVL e Red-Black resolvem isso garantindo altura O(log n) em qualquer caso.</div>
   </div>
 
@@ -2438,6 +2886,13 @@ deque.addLast(<span class="num">2</span>);         <span class="cm">// O(1) amor
     <div class="sectitle">// 01 · invariante de balanceamento</div>
     <div class="def"><div class="lbl">fator de balanceamento BF</div>Para todo nó N: BF(N) = altura(esq) − altura(dir) ∈ {−1, 0, +1}. Toda inserção que viola essa invariante dispara <strong>rotações</strong> para restaurar o equilíbrio — em O(1) rotações por inserção.</div>
     <div class="info"><strong style="color:var(--text0)">Analogia:</strong> um mobile de crianças. Cada braço deve estar equilibrado — se você pendura um peso novo em um lado, um contrapeso automático aparece do outro. As rotações AVL são esse mecanismo: ao detectar BF &gt; 1 ou BF &lt; −1, a árvore redistribui nós para restaurar o equilíbrio, garantindo altura O(log n) para sempre.</div>
+    <div class="sequence-hint">Leitura guiada: motivação, acesso, garantia e custo</div>
+    <div class="grid2 ordered-notes">
+      <div class="note"><strong>Problema que motivou:</strong> a BST simples depende da ordem de inserção. AVL foi criada para impedir que uma árvore de busca vire lista ligada.</div>
+      <div class="note"><strong>Política de acesso:</strong> igual à BST: comparação a partir da raiz. A diferença é que a estrutura se reorganiza para manter caminhos curtos.</div>
+      <div class="note"><strong>Como o dado é acessado:</strong> por caminho de comparações, com altura garantida O(log n). Rotações preservam a ordem em percurso in-order.</div>
+      <div class="note"><strong>Resolveu?</strong> sim para busca previsível. O custo é mais manutenção em inserções/remoções, pois a árvore precisa recalcular alturas e rotacionar.</div>
+    </div>
   </div>
 
   <div class="sec">
@@ -2508,6 +2963,13 @@ deque.addLast(<span class="num">2</span>);         <span class="cm">// O(1) amor
     <div class="sectitle">// 01 · propriedade heap e representação em array</div>
     <div class="def"><div class="lbl">max-heap</div>Árvore binária <em>completa</em> onde todo nó é ≥ seus filhos. O maior elemento fica sempre na raiz — acessível em O(1). Armazenado em array plano: pai de i em ⌊(i−1)/2⌋, filhos de i em 2i+1 e 2i+2.</div>
     <div class="info"><strong style="color:var(--text0)">Truque elegante:</strong> a árvore é completa (sem buracos), então o mapeamento para array é perfeito. Não há ponteiros — a posição no array <em>é</em> a estrutura. É como um mapa de assentos num teatro: saber o número do seu assento já diz exatamente onde sentar.</div>
+    <div class="sequence-hint">Leitura guiada: problema, prioridade, acesso e aplicação</div>
+    <div class="grid2 ordered-notes">
+      <div class="note"><strong>Problema que motivou:</strong> manter sempre disponível o maior ou menor elemento sem ordenar toda a coleção a cada mudança.</div>
+      <div class="note"><strong>Política de acesso:</strong> acesso prioritário à raiz. O heap não promete achar qualquer valor rápido; ele promete achar o extremo rápido.</div>
+      <div class="note"><strong>Como o dado é acessado:</strong> por índices que simulam pai e filhos. A raiz é <code>0</code>; filhos de <code>i</code> são <code>2i+1</code> e <code>2i+2</code>.</div>
+      <div class="note"><strong>Resolveu?</strong> sim para filas de prioridade, escalonadores, Dijkstra e Heap Sort. Não substitui BST quando você precisa buscar valores arbitrários.</div>
+    </div>
   </div>
 
   <div class="sec">
@@ -2583,6 +3045,13 @@ deque.addLast(<span class="num">2</span>);         <span class="cm">// O(1) amor
     </div>
     <div class="info">
       <strong style="color:var(--text0)">Analogia — vestiário de clube:</strong> você chega com seu casaco (valor) e recebe um número de cabide (hash). Para recuperar o casaco, você dá o número — acesso direto, O(1). O atendente (função de hash) decide qual número dar baseado no seu nome. O problema: dois sócios com o mesmo número de cabide (colisão) — e isso acontece inevitavelmente pelo Princípio da Casa dos Pombos.
+    </div>
+    <div class="sequence-hint">Leitura guiada: chave, acesso, colisão e limite</div>
+    <div class="grid2 ordered-notes">
+      <div class="note"><strong>Problema que motivou:</strong> procurar por chave muito rapidamente: nome de usuário, CPF, token de sessão, palavra em dicionário, id de produto.</div>
+      <div class="note"><strong>Política de acesso:</strong> acesso por chave. Você não pergunta "posição 7"; pergunta "valor associado à chave X".</div>
+      <div class="note"><strong>Como o dado é acessado:</strong> a chave passa por <code>hashCode()</code>, vira índice de array e, se houver colisão, a estrutura procura dentro do balde.</div>
+      <div class="note"><strong>Resolveu?</strong> sim no caso médio. O preço é aceitar colisões, redimensionamento e ausência de ordem natural entre chaves.</div>
     </div>
     <div class="warn">
       <strong style="color:var(--text0)">Possivelmente a estrutura mais cobrada em entrevistas técnicas.</strong> Saber explicar como funciona uma função de hash, por que colisões são inevitáveis, e como tratá-las é requisito absoluto para posições de engenharia de software. O Java <code style="font-family:'IBM Plex Mono',monospace;background:var(--bg2);padding:1px 5px;border-radius:4px">HashMap</code> e o Python <code style="font-family:'IBM Plex Mono',monospace;background:var(--bg2);padding:1px 5px;border-radius:4px">dict</code> são tabelas hash.
@@ -3012,6 +3481,13 @@ deque.addLast(<span class="num">2</span>);         <span class="cm">// O(1) amor
     <div class="sectitle">// 01 · teoria</div>
     <div class="def"><div class="lbl">G = (V, E)</div>Um grafo é um conjunto de vértices V e arestas E. Pode ser dirigido, não-dirigido, ponderado ou não. <strong>BFS</strong> usa uma fila — expande por nível, garante caminho mínimo em arestas. <strong>DFS</strong> usa pilha/recursão — vai fundo antes de voltar, base para ciclos e ordenação topológica. Ambos: O(V + E).</div>
     <div class="info"><strong style="color:var(--text0)">Analogia BFS vs DFS:</strong> explorar um labirinto. BFS é uma onda de água espalhando-se radialmente — todos os caminhos a distância 1, depois 2, depois 3. DFS é um espeleólogo: vai fundo numa galeria até o fim, depois volta e tenta outra. BFS encontra o caminho mais curto (em número de arestas). DFS encontra <em>algum</em> caminho, mas não necessariamente o menor.</div>
+    <div class="sequence-hint">Leitura guiada: relação, adjacência, representação e algoritmo</div>
+    <div class="grid2 ordered-notes">
+      <div class="note"><strong>Problema que motivou:</strong> representar relações que não cabem em sequência linear: rotas, redes, dependências, estados, conexões sociais e links.</div>
+      <div class="note"><strong>Política de acesso:</strong> acesso por adjacência. A pergunta central é: "quais vértices são vizinhos deste vértice?".</div>
+      <div class="note"><strong>Como o dado é acessado:</strong> por lista de adjacência, matriz de adjacência ou mapa de vizinhos. Lista economiza memória em grafos esparsos; matriz consulta aresta em O(1), mas custa O(V²).</div>
+      <div class="note"><strong>Resolveu?</strong> sim para conectividade. O algoritmo depende da pergunta: BFS para menor caminho sem pesos, DFS para estrutura/ciclos, Dijkstra para pesos positivos.</div>
+    </div>
   </div>
 
   <div class="sec">
@@ -3107,6 +3583,10 @@ deque.addLast(<span class="num">2</span>);         <span class="cm">// O(1) amor
       <canvas id="dijk-canvas" height="300"></canvas>
     </div>
     <div id="dijk-dist-bar" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px"></div>
+    <div id="dijk-explain" class="dijkstra-explain">
+      Escolha um vértice inicial e avance passo a passo. Cada atualização mostrará a conta
+      <code>distância atual + peso da aresta</code>, a comparação com o valor anterior e o caminho que gerou o novo custo.
+    </div>
     <div id="dijk-log" class="vis-log"></div>
   </div>
 
@@ -3765,9 +4245,7 @@ function scrollMainToTop() {
 }
 
 function insertLearningPanel(page, panel) {
-  const firstSec = page.querySelector('.sec');
-  if (firstSec?.parentNode) firstSec.parentNode.insertBefore(panel, firstSec);
-  else page.appendChild(panel);
+  page.appendChild(panel);
 }
 
 function applyProgress(progress, options = {}) {
@@ -4226,10 +4704,334 @@ async function renderPracticeWorkspace(preferredTopicId) {
   if (!document.getElementById('page-exercicios')) return;
   const topicId = resolvePracticeTopic(preferredTopicId);
   renderPracticeSelector(topicId);
+  initPracticeEnhancements();
   await renderPracticeRequiredTool(topicId);
   renderPracticeDynamicTool(topicId);
   await renderPracticeCodeTool(topicId);
   renderPracticeSimulatorTool(topicId);
+}
+
+let practiceEnhancementsReady = false;
+const ASYMPTOTIC_EXAMPLES = {
+  linearSearch: {
+    code: `for (int i = 0; i < values.length; i++) {\n    if (values[i] == target) return i;\n}\nreturn -1;`,
+    result: 'O(n)',
+    dominant: 'Comparação values[i] == target',
+    explanation: ['O laço avança no máximo por todos os n elementos.', 'Cada iteração faz trabalho constante: uma comparação e possivelmente um retorno.', 'No pior caso, o alvo está no fim ou não existe, então são n verificações.', 'Conclusão: n vezes O(1) = O(n).'],
+    caveat: 'Melhor caso O(1), quando o alvo está na primeira posição.'
+  },
+  binarySearch: {
+    code: `int lo = 0, hi = values.length - 1;\nwhile (lo <= hi) {\n    int mid = (lo + hi) / 2;\n    if (values[mid] == target) return mid;\n    if (values[mid] < target) lo = mid + 1;\n    else hi = mid - 1;\n}\nreturn -1;`,
+    result: 'O(log n)',
+    dominant: 'Dividir o intervalo de busca pela metade',
+    explanation: ['A cada passo, metade dos candidatos é descartada.', 'Depois de k passos restam n / 2^k elementos.', 'A busca termina quando n / 2^k <= 1, então k = log2(n).', 'Conclusão: O(log n).'],
+    caveat: 'Exige array previamente ordenado.'
+  },
+  nestedLoops: {
+    code: `for (int i = 0; i < n; i++) {\n    for (int j = 0; j < n; j++) {\n        count++;\n    }\n}`,
+    result: 'O(n²)',
+    dominant: 'Operação count++ dentro de dois laços',
+    explanation: ['O laço externo roda n vezes.', 'Para cada iteração externa, o laço interno também roda n vezes.', 'Total de execuções: n * n = n².', 'Conclusão: O(n²).'],
+    caveat: 'Se o laço interno depender de outro tamanho m, a forma correta pode ser O(n*m).'
+  },
+  mergeSort: {
+    code: `mergeSort(left half);\nmergeSort(right half);\nmerge(left, right);`,
+    result: 'O(n log n)',
+    dominant: 'Recorrência T(n) = 2T(n/2) + O(n)',
+    explanation: ['O array é dividido em duas metades até chegar a tamanho 1.', 'Há log2(n) níveis de divisão.', 'Em cada nível, o merge processa todos os n elementos no total.', 'Conclusão: O(n) por nível * log n níveis = O(n log n).'],
+    caveat: 'Usa memória auxiliar O(n) na implementação clássica.'
+  },
+  quickSort: {
+    code: `partition(values, pivot);\nquickSort(left side);\nquickSort(right side);`,
+    result: 'O(n log n) médio, O(n²) pior caso',
+    dominant: 'Particionamento + qualidade do pivô',
+    explanation: ['Cada particionamento percorre o subarray uma vez: O(n) naquele nível.', 'Se o pivô divide bem, há log n níveis.', 'Com divisões equilibradas: O(n log n).', 'Se o pivô sempre fica em uma ponta, há n níveis: O(n²).'],
+    caveat: 'Aleatorizar ou escolher melhor o pivô reduz o risco do pior caso.'
+  },
+  dijkstra: {
+    code: `PriorityQueue<Node> pq = new PriorityQueue<>();\nwhile (!pq.isEmpty()) {\n    Node current = pq.poll();\n    for (Edge edge : graph[current.id]) {\n        relax(edge);\n    }\n}`,
+    result: 'O((V + E) log V)',
+    dominant: 'Operações de fila de prioridade durante relaxamentos',
+    explanation: ['Cada vértice pode ser removido da fila com custo log V.', 'Cada aresta pode provocar relaxamento e inserção/atualização com custo log V.', 'Somando vértices e arestas: (V + E) operações relevantes.', 'Conclusão: O((V + E) log V).'],
+    caveat: 'Com matriz de adjacência e sem heap, a forma comum vira O(V²).'
+  },
+  hashLookup: {
+    code: `if (table.containsKey(key)) {\n    return table.get(key);\n}`,
+    result: 'O(1) médio, O(n) pior caso',
+    dominant: 'Cálculo de hash e acesso ao balde',
+    explanation: ['A função hash calcula diretamente o balde esperado.', 'Com boa distribuição, cada balde tem poucos elementos.', 'A consulta média fica constante.', 'Com muitas colisões, pode ser necessário percorrer vários itens: pior caso O(n).'],
+    caveat: 'A garantia depende de boa função hash, resize e estratégia de colisão.'
+  }
+};
+
+function initPracticeEnhancements() {
+  if (practiceEnhancementsReady) return;
+  practiceEnhancementsReady = true;
+  loadAsymptoticExample();
+  resetSortingArena();
+}
+
+function loadAsymptoticExample() {
+  const select = document.getElementById('asymptotic-template');
+  const textarea = document.getElementById('asymptotic-code');
+  if (!select || !textarea) return;
+  const selected = select.value;
+  if (selected !== 'custom' && ASYMPTOTIC_EXAMPLES[selected]) {
+    textarea.value = ASYMPTOTIC_EXAMPLES[selected].code;
+  }
+  analyzeAsymptoticTool();
+}
+
+function inferAsymptotic(code) {
+  const text = String(code || '').toLowerCase();
+  const selected = document.getElementById('asymptotic-template')?.value;
+  if (selected && selected !== 'custom' && ASYMPTOTIC_EXAMPLES[selected]) return ASYMPTOTIC_EXAMPLES[selected];
+  if (/priorityqueue|heap|poll\(|offer\(|relax|dijkstra/.test(text)) return ASYMPTOTIC_EXAMPLES.dijkstra;
+  if (/mergesort|merge\s*\(|2t\(n\/2\)|left half|right half/.test(text)) return ASYMPTOTIC_EXAMPLES.mergeSort;
+  if (/quicksort|partition|pivot|piv[oô]/.test(text)) return ASYMPTOTIC_EXAMPLES.quickSort;
+  if (/while\s*\([^)]*(lo|low|left)[^)]*(hi|high|right)|\/\s*2|>>\s*1/.test(text)) return ASYMPTOTIC_EXAMPLES.binarySearch;
+  if (/containskey|hashmap|hashset|map\.get|set\.contains/.test(text)) return ASYMPTOTIC_EXAMPLES.hashLookup;
+  const loopCount = (text.match(/\b(for|while)\s*\(/g) || []).length;
+  const looksNested = /\b(for|while)\s*\([^)]*\)\s*\{[\s\S]{0,400}\b(for|while)\s*\(/.test(text);
+  if (looksNested || loopCount >= 2) return ASYMPTOTIC_EXAMPLES.nestedLoops;
+  if (loopCount === 1) return ASYMPTOTIC_EXAMPLES.linearSearch;
+  return {
+    result: 'O(1) ou indefinido',
+    dominant: 'Nenhuma repetição evidente foi detectada',
+    explanation: ['Não encontrei laço, recursão ou estrutura de dados dominante no trecho colado.', 'Se o trecho só faz atribuições, comparações ou acessos diretos, o custo tende a ser constante.', 'Se há chamadas de função escondidas, analise o custo dessas chamadas também.', 'Conclusão provisória: O(1), com ressalva.'],
+    caveat: 'Cole a função completa para uma análise mais confiável.'
+  };
+}
+
+function analyzeAsymptoticTool() {
+  const host = document.getElementById('asymptotic-result');
+  const code = document.getElementById('asymptotic-code')?.value || '';
+  if (!host) return;
+  const analysis = inferAsymptotic(code);
+  host.innerHTML = `
+    <div class="complexity-card">
+      <div class="expedition-kicker">// resultado estimado</div>
+      <div class="complexity-badge">${escapeHtml(analysis.result)}</div>
+      <div class="expedition-copy" style="margin-top:10px"><strong>Operação dominante:</strong> ${escapeHtml(analysis.dominant)}</div>
+      <div class="expedition-copy"><strong>Ressalva:</strong> ${escapeHtml(analysis.caveat)}</div>
+    </div>
+    <div class="complexity-card">
+      <div class="expedition-kicker">// como chegamos nisso?</div>
+      <div class="analysis-steps">
+        ${(analysis.explanation || []).map((step, idx) => `<div class="analysis-step"><strong>${idx + 1}.</strong> ${escapeHtml(step)}</div>`).join('')}
+      </div>
+    </div>`;
+}
+
+const SORTING_ARENA_LABELS = {
+  bubble: 'Bubble Sort',
+  insertion: 'Insertion Sort',
+  selection: 'Selection Sort',
+  merge: 'Merge Sort',
+  quick: 'Quick Sort'
+};
+let sortingArena = { base: [], left: null, right: null, timer: null, running: false };
+
+function resetSortingArena() {
+  pauseSortingArena();
+  const n = Number(document.getElementById('arena-size')?.value || 14);
+  sortingArena.base = Array.from({ length: n }, (_, i) => 16 + ((i * 37 + 23) % 150));
+  for (let i = sortingArena.base.length - 1; i > 0; i--) {
+    const j = (i * 7 + 3) % (i + 1);
+    [sortingArena.base[i], sortingArena.base[j]] = [sortingArena.base[j], sortingArena.base[i]];
+  }
+  prepareSortingArenaRuns();
+  renderSortingArena();
+}
+
+function prepareSortingArenaRuns() {
+  const leftAlgo = document.getElementById('arena-left-algo')?.value || 'bubble';
+  const rightAlgo = document.getElementById('arena-right-algo')?.value || 'quick';
+  sortingArena.left = buildArenaRun(sortingArena.base, leftAlgo);
+  sortingArena.right = buildArenaRun(sortingArena.base, rightAlgo);
+  sortingArena.left.name = SORTING_ARENA_LABELS[leftAlgo];
+  sortingArena.right.name = SORTING_ARENA_LABELS[rightAlgo];
+}
+
+function startSortingArena() {
+  if (!sortingArena.base.length) resetSortingArena();
+  if (!sortingArena.left || !sortingArena.right) prepareSortingArenaRuns();
+  if (sortingArena.running) return;
+  sortingArena.running = true;
+  sortingArena.timer = setInterval(() => {
+    stepArenaRun(sortingArena.left);
+    stepArenaRun(sortingArena.right);
+    renderSortingArena();
+    if (sortingArena.left.done && sortingArena.right.done) pauseSortingArena(true);
+  }, 180);
+}
+
+function pauseSortingArena(finished = false) {
+  if (sortingArena.timer) clearInterval(sortingArena.timer);
+  sortingArena.timer = null;
+  sortingArena.running = false;
+  if (finished) renderSortingArena(true);
+}
+
+function buildArenaRun(base, algo) {
+  const frames = buildArenaFrames(base, algo);
+  return { algo, frames, idx: 0, current: frames[0], done: false, name: SORTING_ARENA_LABELS[algo] };
+}
+
+function stepArenaRun(run) {
+  if (!run || run.done) return;
+  run.current = run.frames[Math.min(run.idx, run.frames.length - 1)];
+  run.idx += 1;
+  if (run.idx >= run.frames.length) run.done = true;
+}
+
+function arenaFrame(frames, arr, stats, compare = [], swap = [], sorted = [], note = '') {
+  frames.push({ arr: [...arr], compare: [...compare], swap: [...swap], sorted: [...sorted], note, stats: { ...stats } });
+}
+
+function buildArenaFrames(base, algo) {
+  const a = [...base];
+  const frames = [];
+  const stats = { comparisons: 0, swaps: 0 };
+  arenaFrame(frames, a, stats, [], [], [], 'array inicial');
+  if (algo === 'bubble') {
+    const sorted = [];
+    for (let i = 0; i < a.length; i++) {
+      let changed = false;
+      for (let j = 0; j < a.length - i - 1; j++) {
+        stats.comparisons++;
+        arenaFrame(frames, a, stats, [j, j + 1], [], sorted, `compara ${a[j]} e ${a[j + 1]}`);
+        if (a[j] > a[j + 1]) {
+          [a[j], a[j + 1]] = [a[j + 1], a[j]];
+          stats.swaps++;
+          changed = true;
+          arenaFrame(frames, a, stats, [], [j, j + 1], sorted, 'troca adjacente');
+        }
+      }
+      sorted.unshift(a.length - 1 - i);
+      if (!changed) break;
+    }
+  } else if (algo === 'insertion') {
+    for (let i = 1; i < a.length; i++) {
+      let j = i;
+      while (j > 0) {
+        stats.comparisons++;
+        arenaFrame(frames, a, stats, [j - 1, j], [], Array.from({ length: i }, (_, k) => k), `posiciona ${a[j]}`);
+        if (a[j - 1] <= a[j]) break;
+        [a[j - 1], a[j]] = [a[j], a[j - 1]];
+        stats.swaps++;
+        arenaFrame(frames, a, stats, [], [j - 1, j], [], 'move para a esquerda');
+        j--;
+      }
+    }
+  } else if (algo === 'selection') {
+    const sorted = [];
+    for (let i = 0; i < a.length - 1; i++) {
+      let min = i;
+      for (let j = i + 1; j < a.length; j++) {
+        stats.comparisons++;
+        arenaFrame(frames, a, stats, [j, min], [], sorted, `busca menor para a posição ${i}`);
+        if (a[j] < a[min]) min = j;
+      }
+      if (min !== i) {
+        [a[i], a[min]] = [a[min], a[i]];
+        stats.swaps++;
+        arenaFrame(frames, a, stats, [], [i, min], sorted, 'coloca menor no prefixo');
+      }
+      sorted.push(i);
+    }
+  } else if (algo === 'merge') {
+    function mergeSort(lo, hi) {
+      if (lo >= hi) return;
+      const mid = Math.floor((lo + hi) / 2);
+      mergeSort(lo, mid);
+      mergeSort(mid + 1, hi);
+      const left = a.slice(lo, mid + 1);
+      const right = a.slice(mid + 1, hi + 1);
+      let i = 0, j = 0, k = lo;
+      while (i < left.length && j < right.length) {
+        stats.comparisons++;
+        arenaFrame(frames, a, stats, [lo + i, mid + 1 + j], [], [], `merge [${lo}..${hi}]`);
+        a[k++] = left[i] <= right[j] ? left[i++] : right[j++];
+        stats.swaps++;
+        arenaFrame(frames, a, stats, [], [k - 1], [], 'escreve próximo menor');
+      }
+      while (i < left.length) { a[k++] = left[i++]; stats.swaps++; }
+      while (j < right.length) { a[k++] = right[j++]; stats.swaps++; }
+      arenaFrame(frames, a, stats, [], [], Array.from({ length: hi - lo + 1 }, (_, x) => lo + x), 'subarray combinado');
+    }
+    mergeSort(0, a.length - 1);
+  } else if (algo === 'quick') {
+    function quickSort(lo, hi) {
+      if (lo >= hi) return;
+      const pivot = a[hi];
+      let i = lo - 1;
+      for (let j = lo; j < hi; j++) {
+        stats.comparisons++;
+        arenaFrame(frames, a, stats, [j, hi], [], [hi], `compara com pivô ${pivot}`);
+        if (a[j] <= pivot) {
+          i++;
+          if (i !== j) {
+            [a[i], a[j]] = [a[j], a[i]];
+            stats.swaps++;
+            arenaFrame(frames, a, stats, [], [i, j], [hi], 'move para partição esquerda');
+          }
+        }
+      }
+      [a[i + 1], a[hi]] = [a[hi], a[i + 1]];
+      stats.swaps++;
+      arenaFrame(frames, a, stats, [], [i + 1, hi], [i + 1], 'pivô na posição final');
+      quickSort(lo, i);
+      quickSort(i + 2, hi);
+    }
+    quickSort(0, a.length - 1);
+  }
+  arenaFrame(frames, a, stats, [], [], Array.from({ length: a.length }, (_, i) => i), 'ordenado');
+  return frames;
+}
+
+function arenaScore(run) {
+  const stats = run?.current?.stats || { comparisons: 0, swaps: 0 };
+  const cost = Math.max(1, stats.comparisons + stats.swaps * 1.5 + (run?.frames?.length || 0) * .15);
+  return Math.max(1, Math.round(10000 / cost));
+}
+
+function renderArenaRun(hostId, run) {
+  const host = document.getElementById(hostId);
+  if (!host || !run) return;
+  const frame = run.current || run.frames[0];
+  const max = Math.max(...frame.arr, 1);
+  host.innerHTML = `
+    <div class="expedition-kicker">${run.done ? 'concluído' : 'em disputa'}</div>
+    <div class="expedition-title">${escapeHtml(run.name)}</div>
+    <div class="arena-bars">
+      ${frame.arr.map((value, idx) => {
+        const cls = frame.sorted.includes(idx) ? 'sorted' : frame.swap.includes(idx) ? 'swap' : frame.compare.includes(idx) ? 'compare' : '';
+        return `<div class="arena-bar ${cls}" title="${value}" style="height:${Math.max(8, Math.round(value * 100 / max))}%"></div>`;
+      }).join('')}
+    </div>
+    <div class="arena-stats">
+      <div class="arena-stat"><b>${frame.stats.comparisons}</b><span>comparações</span></div>
+      <div class="arena-stat"><b>${frame.stats.swaps}</b><span>trocas/movs</span></div>
+      <div class="arena-stat"><b>${Math.min(run.idx, run.frames.length)}</b><span>passos</span></div>
+      <div class="arena-stat"><b>${arenaScore(run)}</b><span>score</span></div>
+    </div>
+    <div class="expedition-copy" style="margin-top:8px">${escapeHtml(frame.note)}</div>`;
+}
+
+function renderSortingArena(finished = false) {
+  renderArenaRun('arena-left', sortingArena.left);
+  renderArenaRun('arena-right', sortingArena.right);
+  const summary = document.getElementById('arena-summary');
+  if (!summary || !sortingArena.left || !sortingArena.right) return;
+  if (finished || (sortingArena.left.done && sortingArena.right.done)) {
+    const leftScore = arenaScore(sortingArena.left);
+    const rightScore = arenaScore(sortingArena.right);
+    const winner = leftScore === rightScore ? 'empate técnico' : leftScore > rightScore ? sortingArena.left.name : sortingArena.right.name;
+    summary.innerHTML = `<strong>Resultado:</strong> ${escapeHtml(winner)}. Menos comparações, movimentos e passos geram maior pontuação.`;
+  } else {
+    summary.textContent = 'Compare as cores: azul = comparação, verde = troca/movimento, âmbar = região já consolidada.';
+  }
 }
 
 const SIMULATOR_CONFIGS = {
@@ -4259,8 +5061,8 @@ function renderSimulatorPanel(pageId) {
   panel.className = 'simulator-panel';
   panel.innerHTML = `
     <div class="expedition-kicker">// simulador de campo</div>
-    <div class="expedition-title">Manipule a estrutura antes de seguir pela trilha</div>
-    <div class="expedition-copy">As operações são locais para visualização, e os marcos de aprendizagem são registrados no servidor.</div>
+    <div class="expedition-title">Pratique depois de formar o modelo mental</div>
+    <div class="expedition-copy">Leia primeiro a definição, os casos de uso e os invariantes acima. Depois use o simulador para testar operações; os marcos de aprendizagem são registrados no servidor.</div>
     ${configs.length > 1 ? `<div class="simulator-toolbar">${configs.map((c,i)=>`<button data-sim-tab="${i}">${c.title}</button>`).join('')}</div>` : ''}
     <div class="simulator-host"></div>`;
   insertLearningPanel(page, panel);
@@ -5562,13 +6364,43 @@ function graphReset(){if(gAutoId){clearInterval(gAutoId);gAutoId=null;}gState=nu
 // DIJKSTRA
 let dState=null,dAutoId=null;
 function dijkLog(msg,color){const e=document.getElementById('dijk-log');if(e)e.innerHTML=`<span style="color:${color||'var(--text2)'}">» ${msg}</span><br>`+e.innerHTML;}
-function dijkRenderDistBar(dist,done){const bar=document.getElementById('dijk-dist-bar');if(!bar)return;bar.innerHTML=DNODES.map((nd,i)=>{const d=dist[i];const dc=done&&done.has(i);const col=dc?'var(--green)':d<Infinity?'var(--accent)':'var(--text2)';return`<div style="background:var(--bg2);border:1px solid ${dc?'#2d4a2d':d<Infinity?'#264a6e':'var(--border)'};border-radius:5px;padding:5px 10px;text-align:center;min-width:48px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text2);margin-bottom:2px">${GLABELS[i]}</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:${col}">${d===Infinity?'∞':d}</div></div>`;}).join('');}
-function buildDijkSteps(start){const steps=[];const V=DNODES.length;const dist=Array(V).fill(Infinity);dist[start]=0;const done=new Set();const pq=[[0,start]];steps.push({dist:[...dist],done:new Set(done),current:new Set([start]),ae:null,msg:'início em '+GLABELS[start]});while(pq.length){pq.sort((a,b)=>a[0]-b[0]);const[d,u]=pq.shift();if(done.has(u))continue;done.add(u);steps.push({dist:[...dist],done:new Set(done),current:new Set([u]),ae:null,msg:'finalizando '+GLABELS[u]+' (dist='+d+')'});DEDGES.forEach(([a,b,w])=>{let nb=-1;if(a===u)nb=b;else if(b===u)nb=a;if(nb>=0&&!done.has(nb)){const nd2=dist[u]+w;steps.push({dist:[...dist],done:new Set(done),current:new Set([u,nb]),ae:[u,nb],msg:'relaxando '+GLABELS[u]+'→'+GLABELS[nb]+': '+dist[u]+'+'+w+'='+nd2+(nd2<dist[nb]?' ✓':' sem melhora')});if(nd2<dist[nb]){dist[nb]=nd2;pq.push([nd2,nb]);}}});}steps.push({dist:[...dist],done:new Set(done),current:new Set(),ae:null,msg:'concluído — '+GLABELS.slice(0,V).map((l,i)=>l+'='+dist[i]).join(', ')});return steps;}
-function dijkDrawState(s){const canvas=document.getElementById('dijk-canvas');if(!canvas)return;const{ctx,W,H}=gDrawBase(canvas,DNODES,DEDGES,true);if(s&&s.ae){const a=DNODES[s.ae[0]],b=DNODES[s.ae[1]];ctx.beginPath();ctx.moveTo(a.x*W,a.y*H);ctx.lineTo(b.x*W,b.y*H);ctx.strokeStyle='#d29922';ctx.lineWidth=2.5;ctx.stroke();}gDrawNodes(ctx,DNODES,W,H,s?new Set(Object.keys(Array(DNODES.length).fill(0)).map(Number).filter(i=>s&&s.dist[i]<Infinity)):null,s?s.current:null,s?s.done:null,s?s.dist:null);if(s)dijkRenderDistBar(s.dist,s.done);}
+function dijkFormat(value){return value===Infinity?'∞':String(value);}
+function dijkPathTo(prev,target){const path=[];let cur=target;const guard=new Set();while(cur>=0&&!guard.has(cur)){guard.add(cur);path.unshift(GLABELS[cur]);cur=prev[cur];}return path.join(' → ');}
+function dijkRenderDistBar(dist,done){const bar=document.getElementById('dijk-dist-bar');if(!bar)return;bar.innerHTML=DNODES.map((nd,i)=>{const d=dist[i];const dc=done&&done.has(i);const col=dc?'var(--green)':d<Infinity?'var(--accent)':'var(--text2)';return`<div style="background:var(--bg2);border:1px solid ${dc?'#2d4a2d':d<Infinity?'#264a6e':'var(--border)'};border-radius:5px;padding:5px 10px;text-align:center;min-width:48px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--text2);margin-bottom:2px">${GLABELS[i]}</div><div style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:${col}">${dijkFormat(d)}</div></div>`;}).join('');}
+function dijkExplainHtml(step){
+  const host=document.getElementById('dijk-explain');if(!host||!step)return;
+  host.innerHTML=`<strong>${escapeHtml(step.title||'Passo do Dijkstra')}</strong><br>${step.explain||''}`;
+}
+function buildDijkSteps(start){
+  const steps=[];const V=DNODES.length;const dist=Array(V).fill(Infinity);const prev=Array(V).fill(-1);dist[start]=0;
+  const done=new Set();const pq=[[0,start]];
+  steps.push({dist:[...dist],prev:[...prev],done:new Set(done),current:new Set([start]),ae:null,msg:'início em '+GLABELS[start],title:'Estado inicial',explain:`Começamos em <code>${GLABELS[start]}</code>. A distância dele é <code>0</code>; todos os outros vértices começam como <code>∞</code> porque ainda não há caminho conhecido.`});
+  while(pq.length){
+    pq.sort((a,b)=>a[0]-b[0]);const[d,u]=pq.shift();if(done.has(u))continue;done.add(u);
+    steps.push({dist:[...dist],prev:[...prev],done:new Set(done),current:new Set([u]),ae:null,msg:'finalizando '+GLABELS[u]+' (dist='+d+')',title:'Vértice confirmado: '+GLABELS[u],explain:`A fila escolheu <code>${GLABELS[u]}</code> porque ele tem a menor distância provisória: <code>${d}</code>. Como todas as arestas têm peso não-negativo, esse valor agora é definitivo.`});
+    DEDGES.forEach(([a,b,w])=>{
+      let nb=-1;if(a===u)nb=b;else if(b===u)nb=a;
+      if(nb>=0&&!done.has(nb)){
+        const previous=dist[nb];const nd2=dist[u]+w;const improves=nd2<previous;
+        const beforePrev=[...prev];
+        const candidatePath=dijkPathTo(beforePrev,u)+(dijkPathTo(beforePrev,u)?' → ':'')+GLABELS[nb];
+        const explain=improves
+          ? `Como chegamos em <code>${nd2}</code>: distância até <code>${GLABELS[u]}</code> é <code>${dist[u]}</code>; a aresta <code>${GLABELS[u]}-${GLABELS[nb]}</code> custa <code>${w}</code>. Então <code>${dist[u]} + ${w} = ${nd2}</code>. O valor anterior de <code>${GLABELS[nb]}</code> era <code>${dijkFormat(previous)}</code>, portanto atualizamos. Caminho candidato: <code>${candidatePath}</code>.`
+          : `Testamos <code>${GLABELS[u]}-${GLABELS[nb]}</code>: <code>${dist[u]} + ${w} = ${nd2}</code>. O valor atual de <code>${GLABELS[nb]}</code> já é <code>${dijkFormat(previous)}</code>, que é menor ou igual. Então mantemos o caminho antigo.`;
+        steps.push({dist:[...dist],prev:[...prev],done:new Set(done),current:new Set([u,nb]),ae:[u,nb],msg:'relaxando '+GLABELS[u]+'→'+GLABELS[nb]+': '+dist[u]+'+'+w+'='+nd2+(improves?' atualiza':' mantém'),title:'Relaxamento: '+GLABELS[u]+' para '+GLABELS[nb],explain});
+        if(improves){dist[nb]=nd2;prev[nb]=u;pq.push([nd2,nb]);}
+      }
+    });
+  }
+  const summary=GLABELS.slice(0,V).map((label,i)=>`<div><code>${label}</code>: custo <code>${dijkFormat(dist[i])}</code>${dist[i]<Infinity?` pelo caminho <code>${dijkPathTo(prev,i)}</code>`:''}</div>`).join('');
+  steps.push({dist:[...dist],prev:[...prev],done:new Set(done),current:new Set(),ae:null,msg:'concluído — '+GLABELS.slice(0,V).map((l,i)=>l+'='+dist[i]).join(', '),title:'Resultado final',explain:`Cada número final é o menor custo encontrado a partir da origem. ${summary}`});
+  return steps;
+}
+function dijkDrawState(s){const canvas=document.getElementById('dijk-canvas');if(!canvas)return;const{ctx,W,H}=gDrawBase(canvas,DNODES,DEDGES,true);if(s&&s.ae){const a=DNODES[s.ae[0]],b=DNODES[s.ae[1]];ctx.beginPath();ctx.moveTo(a.x*W,a.y*H);ctx.lineTo(b.x*W,b.y*H);ctx.strokeStyle='#d29922';ctx.lineWidth=2.5;ctx.stroke();}gDrawNodes(ctx,DNODES,W,H,s?new Set(Object.keys(Array(DNODES.length).fill(0)).map(Number).filter(i=>s&&s.dist[i]<Infinity)):null,s?s.current:null,s?s.done:null,s?s.dist:null);if(s){dijkRenderDistBar(s.dist,s.done);dijkExplainHtml(s);}}
 function dijkInit(){if(dAutoId){clearInterval(dAutoId);dAutoId=null;}const start=parseInt(document.getElementById('dijk-start').value);dState={steps:buildDijkSteps(start),idx:0};document.getElementById('dijk-step-btn').disabled=false;document.getElementById('dijk-log').innerHTML='';dijkDrawState(null);dijkRenderDistBar(Array(6).fill(Infinity),new Set());dijkStep();}
 function dijkStep(){if(!dState||dState.idx>=dState.steps.length)return;const s=dState.steps[dState.idx++];dijkDrawState(s);const done=dState.idx>=dState.steps.length;dijkLog(s.msg,done?'var(--green)':'var(--text1)');if(done){document.getElementById('dijk-step-btn').disabled=true;if(dAutoId){clearInterval(dAutoId);dAutoId=null;}}}
 function dijkAuto(){if(dAutoId){clearInterval(dAutoId);dAutoId=null;return;}if(!dState)return;dAutoId=setInterval(()=>{if(!dState||dState.idx>=dState.steps.length){clearInterval(dAutoId);dAutoId=null;return;}dijkStep();},700);}
-function dijkReset(){if(dAutoId){clearInterval(dAutoId);dAutoId=null;}dState=null;document.getElementById('dijk-step-btn').disabled=true;document.getElementById('dijk-log').innerHTML='';document.getElementById('dijk-dist-bar').innerHTML='';dijkDrawState(null);}
+function dijkReset(){if(dAutoId){clearInterval(dAutoId);dAutoId=null;}dState=null;document.getElementById('dijk-step-btn').disabled=true;document.getElementById('dijk-log').innerHTML='';document.getElementById('dijk-dist-bar').innerHTML='';const ex=document.getElementById('dijk-explain');if(ex)ex.innerHTML='Escolha um vértice inicial e avance passo a passo. Cada atualização mostrará a conta <code>distância atual + peso da aresta</code>, a comparação com o valor anterior e o caminho que gerou o novo custo.';dijkDrawState(null);}
 
 /* ═══════════════════════════════════════════════════
    D&C — RECURSION TREE

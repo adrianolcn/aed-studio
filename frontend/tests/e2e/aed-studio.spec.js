@@ -58,6 +58,19 @@ test('fluxo completo: login, dashboard, recomendação, simulador, código, prog
   await page.locator('#practice-simulator-host [data-sim-action="insert"]').click();
   await expect(page.locator('#practice-simulator-host .sim-stage')).toContainText('42');
 
+  await page.locator('#asymptotic-template').selectOption('binarySearch');
+  await expect(page.locator('#asymptotic-result')).toContainText('O(log n)');
+  await expect(page.locator('#asymptotic-result')).toContainText(/como chegamos|Conclusão/i);
+
+  await page.locator('#arena-left-algo').selectOption('bubble');
+  await page.locator('#arena-right-algo').selectOption('quick');
+  await page.locator('#arena-size').selectOption('10');
+  await page.getByRole('button', { name: 'novo array' }).click();
+  await page.getByRole('button', { name: 'iniciar arena' }).click();
+  await expect(page.locator('#arena-left .arena-bar').first()).toBeVisible();
+  await expect(page.locator('#arena-summary')).toContainText(/Compare|Resultado/);
+  await page.getByRole('button', { name: 'pausar' }).click();
+
   await expect(page.locator('#practice-code-host textarea')).toBeVisible();
   const editor = page.locator('#practice-code-host textarea');
   await editor.fill('return -1;');

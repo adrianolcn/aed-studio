@@ -25,7 +25,7 @@ API Spring Boot -> judge -> Docker -> container isolado -> resultado + submissã
 
 Instale:
 
-- Java JDK 17 ou superior.
+- Java JDK 17 LTS. Use Java 17 como versão padrão do projeto.
 - PostgreSQL 14 ou superior.
 - Node.js 20 ou superior, para testes do front-end.
 - Docker Desktop, recomendado para sandbox de código em modo produção.
@@ -40,6 +40,16 @@ docker --version
 ```
 
 No Windows, use PowerShell de preferência.
+
+O `java -version` deve indicar uma versão iniciada por `17`, por exemplo `17.0.x`. O repositório inclui `.java-version` com `17`, e o CI do GitHub também usa Temurin 17 em Linux, Windows e macOS. Se aparecer Java 21, 24 ou superior, configure o `JAVA_HOME` para o JDK 17 antes de iniciar o back-end. Essas versões mais novas podem gerar warnings de bibliotecas internas mesmo quando o projeto está correto.
+
+Exemplo no PowerShell, ajustando o caminho conforme a instalação do seu JDK:
+
+```powershell
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-17"
+$env:Path = "$env:JAVA_HOME\bin;$env:Path"
+java -version
+```
 
 ## 3. Preparar o Banco PostgreSQL
 
