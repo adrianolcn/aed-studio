@@ -16,10 +16,15 @@ public class AnalyticsOverviewDto {
     private Integer correctAttempts;
     private Integer overallAccuracyPercent;
     private Integer simulatorInteractions;
+    private Integer codeSubmissions;
+    private Integer codeSuccessPercent;
+    private Integer codeErrorPercent;
     private Integer totalXp;
     private Integer streakDays;
     private String consistencyLabel;
     private List<TopicAnalyticsDto> strongestTopics;
     private List<TopicAnalyticsDto> attentionTopics;
+    private List<TopicAnalyticsDto> improvingTopics;
+    private List<TopicAnalyticsDto> regressingTopics;
     private List<String> practicalSuggestions;
 }

@@ -14,8 +14,11 @@ public class RecommendationDto {
     private String title;
     private String trackId;
     private String category;
+    private String recommendationType;
     private String action;
     private String reason;
+    private String evidence;
+    private String suggestedActivity;
     private Integer priority;
     private Double confidence;
 }

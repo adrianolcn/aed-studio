@@ -52,6 +52,17 @@ test('simuladores, recomendações, analytics e exercícios dinâmicos estão in
   assert.match(appHtml, /AedApi\.submitGeneratedExercise\(exercise\.id, btn\.dataset\.answer, elapsed\)/);
   assert.match(appHtml, /AedApi\.getCodeChallenges\(pageId\)/);
   assert.match(appHtml, /AedApi\.runCode\(challenge\.id/);
+  assert.match(appHtml, /AedApi\.getCodeSubmissions/);
+  assert.match(appHtml, /histórico de submissões/);
+  assert.match(appHtml, /challenge\.signature/);
+  assert.match(appHtml, /result\.submissionId/);
+  assert.match(appHtml, /result\.executionTimeMs/);
+  assert.match(appHtml, /dica conceitual/);
+  assert.match(appHtml, /pseudoSkeleton/);
+  assert.match(appHtml, /passedCount/);
+  assert.match(appHtml, /riskLevel/);
+  assert.match(appHtml, /suggestedActivity/);
+  assert.match(appHtml, /didacticFocus/);
   assert.match(appHtml, /id="recommendation-primary"/);
   assert.match(appHtml, /id="analytics-overview"/);
   assert.match(appHtml, /base do explorador/);
@@ -96,4 +107,7 @@ test('health público e base configurável existem no cliente central', () => {
   assert.match(apiJs, /async function getXpHistory\(\)/);
   assert.match(apiJs, /async function getCodeChallenges\(topicId\)/);
   assert.match(apiJs, /async function runCode\(challengeId, code\)/);
+  assert.match(apiJs, /async function getCodeSubmissions/);
+  assert.match(apiJs, /async function getLatestCodeSubmission\(exerciseId\)/);
+  assert.match(apiJs, /async function getBestCodeSubmission\(exerciseId\)/);
 });

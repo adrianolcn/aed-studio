@@ -233,9 +233,33 @@ test('usa contratos de missões, histórico de XP e sandbox de código', async (
         return response(200, [{ date: '2026-04-18', xp: 30, cumulativeXp: 30 }]);
       }
       if (url.endsWith('/api/code/topics/algoritmos/challenges')) {
-        return response(200, [{ id: 'algoritmos-code-sum' }]);
+        return response(200, [{
+          id: 'algoritmos-code-sum',
+          signature: 'solve(int[] values)',
+          examples: ['solve([1,2,3]) -> 6'],
+          conceptualHint: 'use acumulador',
+          pseudoSkeleton: 'total = 0',
+        }]);
       }
-      return response(200, { accepted: true, awarded: 30 });
+      if (url.endsWith('/api/code/submissions?exerciseId=algoritmos-code-sum')) {
+        return response(200, [{ id: 7, exerciseId: 'algoritmos-code-sum', status: 'SUCCESS', best: true }]);
+      }
+      if (url.endsWith('/api/code/submissions/latest?exerciseId=algoritmos-code-sum')) {
+        return response(200, { id: 7, exerciseId: 'algoritmos-code-sum', status: 'SUCCESS' });
+      }
+      if (url.endsWith('/api/code/submissions/best?exerciseId=algoritmos-code-sum')) {
+        return response(200, { id: 7, exerciseId: 'algoritmos-code-sum', status: 'SUCCESS', best: true });
+      }
+      return response(200, {
+        accepted: true,
+        status: 'SUCCESS',
+        submissionId: 7,
+        awarded: 30,
+        passedCount: 3,
+        totalChecks: 3,
+        executionTimeMs: 42,
+        hint: 'ok',
+      });
     },
   });
   sessionStorage.setItem('aed_access_token', 'access-1');
@@ -245,13 +269,25 @@ test('usa contratos de missões, histórico de XP e sandbox de código', async (
   const history = await api.getXpHistory();
   const challenges = await api.getCodeChallenges('algoritmos');
   const run = await api.runCode('algoritmos-code-sum', 'return 0;');
+  const submissions = await api.getCodeSubmissions({ exerciseId: 'algoritmos-code-sum' });
+  const latest = await api.getLatestCodeSubmission('algoritmos-code-sum');
+  const best = await api.getBestCodeSubmission('algoritmos-code-sum');
 
   assert.equal(missions[0].id, 'arrays-map-3');
   assert.equal(mission.completed, true);
   assert.equal(history[0].cumulativeXp, 30);
   assert.equal(challenges[0].id, 'algoritmos-code-sum');
+  assert.equal(challenges[0].signature, 'solve(int[] values)');
+  assert.equal(challenges[0].conceptualHint, 'use acumulador');
   assert.equal(run.accepted, true);
+  assert.equal(run.status, 'SUCCESS');
+  assert.equal(run.submissionId, 7);
+  assert.equal(run.passedCount, 3);
+  assert.equal(submissions[0].best, true);
+  assert.equal(latest.id, 7);
+  assert.equal(best.status, 'SUCCESS');
   assert.equal(calls[1].url, 'http://localhost:8080/api/simulations/missions/arrays-map-3/submit');
   assert.equal(JSON.parse(calls[1].opts.body).stateSnapshot, '{"values":[3,6,9]}');
   assert.equal(calls[4].url, 'http://localhost:8080/api/code/run');
+  assert.equal(calls[5].url, 'http://localhost:8080/api/code/submissions?exerciseId=algoritmos-code-sum');
 });

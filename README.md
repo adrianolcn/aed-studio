@@ -1,7 +1,47 @@
 # AED·Studio
 
-> Plataforma educacional de Algoritmos e Estrutura de Dados com autenticação completa.
-> Back-end em Spring Boot 3.2 · Java 17 · PostgreSQL · Flyway · JWT.
+> Plataforma educacional full-stack para aprender Algoritmos e Estruturas de Dados com trilhas, progresso persistido, simuladores interativos, exercícios dinâmicos, judge de código, recomendações e analytics.
+
+![AED Studio login preview](docs/assets/aed-studio-login-preview.png)
+
+![Java](https://img.shields.io/badge/Java-17-2f8cff?style=for-the-badge)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-39b54a?style=for-the-badge)
+![JWT](https://img.shields.io/badge/Auth-JWT-8b5cf6?style=for-the-badge)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Flyway-336791?style=for-the-badge)
+![Playwright](https://img.shields.io/badge/E2E-Playwright-45ba4b?style=for-the-badge)
+
+## Visão Geral
+
+AED Studio é uma plataforma educacional com identidade própria de exploração e descoberta. O aluno avança por trilhas, desbloqueia territórios de conhecimento, resolve exercícios, manipula estruturas em simuladores e envia código para um judge Java com histórico persistido.
+
+O projeto foi pensado como MVP sério: o back-end é a fonte de verdade para autenticação, progresso, XP, streak, badges, exercícios, simulações, submissões, analytics e recomendações.
+
+## Vitrine Técnica
+
+| Área | Implementação |
+|---|---|
+| Autenticação | JWT + refresh token persistido + logout |
+| Educação | Trilhas, tópicos, pré-requisitos e estados pedagógicos |
+| Progresso | Persistência por usuário, tópico, trilha e visão geral |
+| Exercícios | Fixos, dinâmicos e tentativas persistidas |
+| Simuladores | Arrays, pilhas, filas, listas ligadas, BST, hash e grafos |
+| Code judge | Java com múltiplas assinaturas controladas e histórico |
+| Analytics | Desempenho geral, por tópico, por trilha e por código |
+| Recomendações | Heurísticas explicáveis com evidências reais |
+| CI | Backend/front em Linux, Windows, macOS e E2E Playwright |
+
+## Documentação Rápida
+
+- [Manual de execução](MANUAL_EXECUCAO.md)
+- [Arquitetura](docs/ARCHITECTURE.md)
+- [API Reference](docs/API_REFERENCE.md)
+- [Testes e CI](docs/TESTING_AND_CI.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Guia para subir no GitHub](docs/GUIA-GITHUB.md)
+- [Contribuindo](CONTRIBUTING.md)
+- [Segurança](SECURITY.md)
+- [Changelog](CHANGELOG.md)
+- [Notas da atualização](GITHUB_RELEASE_NOTES.md)
 
 ---
 
@@ -9,9 +49,10 @@
 
 - Front-end estático em `frontend/login.html` e `frontend/aed-studio.html`.
 - API JWT para cadastro, login, refresh, logout e experiência educacional persistida.
-- Catálogo com trilhas, pré-requisitos, progresso por tópico/trilha, exercícios, simuladores, recomendações e analytics.
+- Catálogo com trilhas, pré-requisitos, progresso por tópico/trilha, exercícios, simuladores avaliáveis, judge de código, recomendações explicáveis e analytics interpretativo.
+- Code judge Java com múltiplas assinaturas controladas, casos de teste estruturados, submissões persistidas, histórico por desafio e métricas integradas ao analytics.
 - Health check público em `GET /api/health` e Swagger/OpenAPI em `/swagger-ui/index.html` e `/v3/api-docs`.
-- Testes de back-end com Maven e testes de contrato do front-end com Node.
+- Testes de back-end com Maven, contratos do front-end com Node e E2E real com Playwright em navegador headless.
 
 ---
 
@@ -32,7 +73,8 @@ aed-studio/
 │   │   │   ├── LearningController.java  ← exercícios fixos e dinâmicos
 │   │   │   ├── SimulationController.java← eventos dos simuladores
 │   │   │   ├── RecommendationController.java
-│   │   │   └── AnalyticsController.java
+│   │   │   ├── AnalyticsController.java
+│   │   │   └── CodeController.java      ← judge e histórico de submissões
 │   │   ├── service/
 │   │   │   ├── AuthService.java         ← register, login, refresh, logout
 │   │   │   ├── ProgressService.java     ← visitas, XP, progresso, exercícios, simulações
@@ -48,6 +90,7 @@ aed-studio/
 │   │   │   ├── TopicState.java
 │   │   │   ├── XpEvent.java             ← idempotência de XP
 │   │   │   ├── ExerciseAttempt.java     ← tentativas persistidas
+│   │   │   ├── CodeSubmission.java      ← submissões do judge
 │   │   │   ├── GeneratedExercise.java   ← exercícios gerados entregues
 │   │   │   ├── SimulationEvent.java     ← interação educacional nos simuladores
 │   │   │   └── UserBadge.java
@@ -57,13 +100,14 @@ aed-studio/
 │   ├── src/main/resources/
 │   │   ├── application.properties
 │   │   ├── application-dev.properties
-│   │   └── db/migration/                ← Flyway SQL (V1–V6)
+│   │   └── db/migration/                ← Flyway SQL (V1–V7)
 │   └── pom.xml
 ├── frontend/
 │   ├── login.html                       ← tela de autenticação
 │   ├── api.js                           ← cliente HTTP com refresh automático
 │   └── aed-studio.html                  ← plataforma principal e experiência interativa
-├── .github/workflows/ci.yml             ← testes automatizados
+├── playwright.config.js                 ← E2E real com backend + frontend
+├── .github/workflows/ci.yml             ← testes automatizados multiplataforma
 ├── .env.example                         ← template de variáveis de ambiente
 ├── .gitignore
 ├── LICENSE
@@ -235,6 +279,15 @@ mvnw.cmd test
 npm run test:frontend
 ```
 
+**E2E real com navegador**
+```bash
+npm install
+npm run playwright:install
+npm run test:e2e
+```
+
+O Playwright sobe automaticamente o back-end com perfil `e2e` usando H2 em memória e um servidor estático local para o front-end.
+
 ---
 
 ## API Reference
@@ -277,29 +330,42 @@ npm run test:frontend
 
 | Método | Rota | Auth | Descrição |
 |---|---|---|---|
-| `GET` | `/topics/{topicId}/challenges` | ✓ | Lista desafios de código seguros do tópico |
-| `POST` | `/run` | ✓ | Compila e executa o corpo da solução em sandbox com timeout e política restritiva |
+| `GET` | `/topics/{topicId}/challenges` | ✓ | Lista desafios de código seguros do tópico, com dicas, pseudoesqueleto, dificuldade e XP |
+| `POST` | `/run` | ✓ | Compila e executa o corpo da solução em sandbox, retorna cenários passados/falhos, status, submissão, tempo e XP idempotente |
+| `GET` | `/submissions?topicId=&exerciseId=` | ✓ | Lista histórico de submissões do usuário por tópico e/ou desafio |
+| `GET` | `/submissions/latest?exerciseId=` | ✓ | Retorna a última submissão do desafio |
+| `GET` | `/submissions/best?exerciseId=` | ✓ | Retorna a melhor submissão do desafio |
+
+Assinaturas controladas atualmente suportadas pelo judge:
+
+- `solve(int[] values)`
+- `solve(String input)`
+- `solve(int n)`
+- `solve(int[] values, int target)`
+- `solve(String[] values)`
+
+O front envia apenas o corpo do método. O back-end monta a classe de teste, valida políticas básicas, executa no sandbox configurado e persiste cada submissão.
 
 ### Simuladores — `/api/simulations`
 
 | Método | Rota | Auth | Descrição |
 |---|---|---|---|
 | `POST` | `/events` | ✓ | Registra interação relevante do simulador e concede XP idempotente quando aplicável |
-| `GET` | `/topics/{topicId}/missions` | ✓ | Lista missões guiadas e critérios formais do simulador |
+| `GET` | `/topics/{topicId}/missions` | ✓ | Lista missões guiadas/desafio com foco didático, prompt e critérios formais do simulador |
 | `POST` | `/missions/{missionId}/submit` | ✓ | Valida estado do simulador e concede XP idempotente pela missão |
 
 ### Recomendações — `/api/recommendations`
 
 | Método | Rota | Auth | Descrição |
 |---|---|---|---|
-| `GET` | `/` | ✓ | Retorna recomendação principal, próximos passos, revisões e foco de trilha |
+| `GET` | `/` | ✓ | Retorna recomendação principal, próximos passos, revisões e foco de trilha com evidência e atividade sugerida |
 
 ### Analytics — `/api/analytics`
 
 | Método | Rota | Auth | Descrição |
 |---|---|---|---|
-| `GET` | `/overview` | ✓ | Visão geral de acerto, tentativas, simulações, XP e pontos de atenção |
-| `GET` | `/topics` | ✓ | Métricas por tópico, com insight derivado dos dados |
+| `GET` | `/overview` | ✓ | Visão geral de acerto, tentativas, simulações, XP, pontos de atenção, melhora e regressão |
+| `GET` | `/topics` | ✓ | Métricas por tópico, tendência, risco, abandono e insight derivado dos dados |
 | `GET` | `/trails` | ✓ | Métricas por trilha |
 | `GET` | `/xp-history` | ✓ | Série temporal diária de XP e acumulado |
 
@@ -403,7 +469,8 @@ const generated = await AedApi.generateExercise('arrays', 1);
 await AedApi.submitGeneratedExercise(generated.id, 'A', 18);
 
 const challenges = await AedApi.getCodeChallenges('arrays');
-await AedApi.runCode(challenges[0].id, 'int total = 0; for (int value : values) total += value; return total;');
+await AedApi.runCode(challenges[0].id, 'for (int i = 0; i < values.length; i++) { if (values[i] == target) return i; } return -1;');
+const history = await AedApi.getCodeSubmissions({ exerciseId: challenges[0].id });
 ```
 
 ---

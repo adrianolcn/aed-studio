@@ -332,7 +332,9 @@ class EndToEndIntegrationTest {
         mockMvc.perform(get("/api/code/topics/algoritmos/challenges")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value("algoritmos-code-sum"));
+                .andExpect(jsonPath("$[0].id").value("algoritmos-code-sum"))
+                .andExpect(jsonPath("$[0].signature").value("solve(int[] values)"))
+                .andExpect(jsonPath("$[0].examples[0]").isNotEmpty());
 
         mockMvc.perform(post("/api/code/run")
                         .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
@@ -340,6 +342,8 @@ class EndToEndIntegrationTest {
                         .content("{\"challengeId\":\"algoritmos-code-sum\",\"code\":\"System.exit(0); return 0;\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accepted").value(false))
+                .andExpect(jsonPath("$.status").value("ERROR"))
+                .andExpect(jsonPath("$.submissionId").isNumber())
                 .andExpect(jsonPath("$.feedback").value("Código rejeitado antes da execução por violar a política do sandbox."));
 
         String validCode = "int total = 0; for (int value : values) { total += value; } return total;";
@@ -349,6 +353,8 @@ class EndToEndIntegrationTest {
                         .content(objectMapper.writeValueAsString(new com.aedstudio.dto.CodeRunRequest("algoritmos-code-sum", validCode))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accepted").value(true))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.submissionId").isNumber())
                 .andExpect(jsonPath("$.awarded").value(30));
 
         mockMvc.perform(post("/api/code/run")
@@ -358,6 +364,110 @@ class EndToEndIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accepted").value(true))
                 .andExpect(jsonPath("$.awarded").value(0));
+
+        mockMvc.perform(get("/api/code/submissions")
+                        .param("exerciseId", "algoritmos-code-sum")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].exerciseId").value("algoritmos-code-sum"))
+                .andExpect(jsonPath("$[0].status").value("SUCCESS"))
+                .andExpect(jsonPath("$[0].passedTests").value(3));
+
+        mockMvc.perform(get("/api/code/submissions/best")
+                        .param("exerciseId", "algoritmos-code-sum")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.best").value(true))
+                .andExpect(jsonPath("$.status").value("SUCCESS"));
+    }
+
+    @Test
+    @DisplayName("desafio de código respeita trilha, retorna dicas e cenários nomeados")
+    void topicSpecificCodeChallengeFlow() throws Exception {
+        String token = registerAndExtract("arraycodeuser", "arraycode@aedstudio.com").get("accessToken").asText();
+
+        mockMvc.perform(get("/api/code/topics/arrays/challenges")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isLocked());
+
+        completeTopic(token, "algoritmos-check");
+        completeTopic(token, "tad-check");
+
+        mockMvc.perform(get("/api/code/topics/arrays/challenges")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value("arrays-code-search"))
+                .andExpect(jsonPath("$[0].signature").value("solve(int[] values, int target)"))
+                .andExpect(jsonPath("$[0].conceptualHint").isNotEmpty())
+                .andExpect(jsonPath("$[0].pseudoSkeleton").isNotEmpty())
+                .andExpect(jsonPath("$[0].difficulty").value(1));
+
+        mockMvc.perform(post("/api/code/run")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new com.aedstudio.dto.CodeRunRequest("arrays-code-search", "return -1;"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accepted").value(false))
+                .andExpect(jsonPath("$.passedCount").value(1))
+                .andExpect(jsonPath("$.totalChecks").value(3))
+                .andExpect(jsonPath("$.hint").isNotEmpty())
+                .andExpect(jsonPath("$.failedChecks[0]").isNotEmpty());
+
+        String validCode = "for (int i = 0; i < values.length; i++) { if (values[i] == target) return i; } return -1;";
+        mockMvc.perform(post("/api/code/run")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new com.aedstudio.dto.CodeRunRequest("arrays-code-search", validCode))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accepted").value(true))
+                .andExpect(jsonPath("$.passedCount").value(3))
+                .andExpect(jsonPath("$.totalChecks").value(3))
+                .andExpect(jsonPath("$.passedChecks[*]", hasItem("encontra no meio")))
+                .andExpect(jsonPath("$.awarded").value(35));
+    }
+
+    @Test
+    @DisplayName("judge suporta múltiplas assinaturas e analytics de código")
+    void multiSignatureCodeJudgeAndAnalytics() throws Exception {
+        String token = registerAndExtract("multicodeuser", "multicode@aedstudio.com").get("accessToken").asText();
+
+        completeTopic(token, "algoritmos-check");
+
+        mockMvc.perform(get("/api/code/topics/tad/challenges")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].signature").value("solve(String input)"));
+
+        mockMvc.perform(post("/api/code/run")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new com.aedstudio.dto.CodeRunRequest(
+                                "tad-code-contract-length",
+                                "if (input == null) return 0; return input.trim().length();"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accepted").value(true))
+                .andExpect(jsonPath("$.status").value("SUCCESS"))
+                .andExpect(jsonPath("$.passedCount").value(3));
+
+        mockMvc.perform(get("/api/code/topics/notacao/challenges")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].signature").value("solve(int n)"));
+
+        mockMvc.perform(post("/api/code/run")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new com.aedstudio.dto.CodeRunRequest(
+                                "notacao-code-halving",
+                                "int steps = 0; while (n > 1) { n = n / 2; steps++; } return steps;"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accepted").value(true));
+
+        mockMvc.perform(get("/api/analytics/overview")
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.codeSubmissions").value(2))
+                .andExpect(jsonPath("$.codeSuccessPercent").value(100));
     }
 
     @Test

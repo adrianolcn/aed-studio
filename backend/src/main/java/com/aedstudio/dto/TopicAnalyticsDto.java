@@ -20,6 +20,14 @@ public class TopicAnalyticsDto {
     private Integer correctAttempts;
     private Integer accuracyPercent;
     private Integer simulatorInteractions;
+    private Integer codeSubmissions;
+    private Integer codeSuccessPercent;
+    private Integer codeErrorPercent;
     private LocalDateTime lastAttemptAt;
+    private String trendLabel;
+    private String riskLevel;
+    private Boolean abandoned;
+    private Boolean improving;
+    private Boolean regressing;
     private String insight;
 }

@@ -329,6 +329,22 @@ const AedApi = (() => {
     });
   }
 
+  async function getCodeSubmissions({ topicId = null, exerciseId = null } = {}) {
+    const params = new URLSearchParams();
+    if (topicId) params.set('topicId', topicId);
+    if (exerciseId) params.set('exerciseId', exerciseId);
+    const suffix = params.toString() ? `?${params.toString()}` : '';
+    return json(`/api/code/submissions${suffix}`);
+  }
+
+  async function getLatestCodeSubmission(exerciseId) {
+    return json(`/api/code/submissions/latest?exerciseId=${encodeURIComponent(exerciseId)}`);
+  }
+
+  async function getBestCodeSubmission(exerciseId) {
+    return json(`/api/code/submissions/best?exerciseId=${encodeURIComponent(exerciseId)}`);
+  }
+
   function isAuthenticated() {
     return !!storage.getAccess();
   }
@@ -369,6 +385,9 @@ const AedApi = (() => {
     getXpHistory,
     getCodeChallenges,
     runCode,
+    getCodeSubmissions,
+    getLatestCodeSubmission,
+    getBestCodeSubmission,
     refreshAccessToken,
     isAuthenticated,
     getCurrentUser,

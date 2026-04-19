@@ -6,6 +6,11 @@
   "scripts": {
     "test:frontend": "npm run test:frontend:contracts && npm run test:frontend:visual",
     "test:frontend:contracts": "node frontend/tests/api.test.js && node frontend/tests/app-contract.test.js",
-    "test:frontend:visual": "node frontend/tests/visual-e2e.test.js"
+    "test:frontend:visual": "node frontend/tests/visual-e2e.test.js",
+    "test:e2e": "playwright test",
+    "playwright:install": "playwright install --with-deps chromium"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.45.0"
   }
 }

@@ -90,3 +90,14 @@ spring.log
 *.swp
 *.swo
 .cache/
+
+# ── Node / Playwright ──────────────────────────────────────────
+node_modules/
+playwright-report/
+test-results/
+.playwright/
+
+# ── Artefatos locais de empacotamento/verificação ──────────────
+dist/
+_verify*.png
+.chrome-profile*/

@@ -147,6 +147,35 @@ public class ProgressService {
     }
 
     @Transactional
+    public ProgressResponse recordCodeSuccess(User user, String topicId, String challengeId) {
+        validateTopic(topicId);
+        ensureTopicAvailable(user, topicId);
+
+        if (!exerciseAttemptRepository.existsByUserAndExerciseIdAndCorrectTrue(user, challengeId)) {
+            exerciseAttemptRepository.save(ExerciseAttempt.builder()
+                    .user(user)
+                    .topicId(topicId)
+                    .exerciseId(challengeId)
+                    .type("CODE")
+                    .answer("accepted")
+                    .correct(true)
+                    .timeSpentSeconds(0)
+                    .build());
+        }
+
+        boolean completed = maybeCompleteTopic(user, topicId);
+        if (completed) {
+            awardEventIfNew(user, "complete_" + topicId, 25);
+        }
+
+        user.updateStreak();
+        userRepository.save(user);
+        User fresh = userRepository.findById(user.getId()).orElse(user);
+        awardBadges(fresh);
+        return getProgress(fresh);
+    }
+
+    @Transactional
     public GeneratedExerciseDto generateExercise(User user, GeneratedExerciseRequest req) {
         validateTopic(req.getTopicId());
         ensureTopicAvailable(user, req.getTopicId());
@@ -570,6 +599,10 @@ public class ProgressService {
 
     private GeneratedTemplate buildGeneratedTemplate(TopicCatalog.TopicDefinition topic, long sequence, int difficulty) {
         int variant = (int) ((sequence + difficulty) % 4);
+        GeneratedTemplate structural = buildStructuralGeneratedTemplate(topic, sequence, difficulty, variant);
+        if (structural != null) {
+            return structural;
+        }
         String title = topic.title();
         String description = topic.description();
         if (variant == 0) {
@@ -625,6 +658,84 @@ public class ProgressService {
                 "Antes de marcar, execute ao menos uma inserção e uma busca no simulador.");
     }
 
+    private GeneratedTemplate buildStructuralGeneratedTemplate(
+            TopicCatalog.TopicDefinition topic,
+            long sequence,
+            int difficulty,
+            int variant) {
+        int a = 2 + difficulty + (int) (sequence % 5);
+        int b = a + 3;
+        int c = a + 6;
+        return switch (topic.id()) {
+            case "arrays" -> switch (variant) {
+                case 0 -> new GeneratedTemplate("TRACE_OUTPUT",
+                        "Array em campo: comece com [" + a + ", " + b + "]. Insira " + c
+                                + " ao final e remova o índice 1. Qual estado final?",
+                        List.of("[" + a + ", " + c + "]", "[" + b + ", " + c + "]", "[" + a + ", " + b + "]", "[" + c + ", " + a + "]"),
+                        "A",
+                        "Correto: remover o índice 1 desloca os elementos à direita.",
+                        "Acompanhe índice por índice: primeiro insere no fim, depois remove a posição 1.");
+                case 1 -> new GeneratedTemplate("MULTIPLE_CHOICE",
+                        "Em uma busca linear por " + b + " no array [" + a + ", " + b + ", " + c + "], quantas comparações no pior caso até encontrar?",
+                        List.of("1", "2", "3", "0"),
+                        "B",
+                        "Correto: compara " + a + " e depois encontra " + b + ".",
+                        "Busca linear percorre do início até encontrar a chave.");
+                default -> new GeneratedTemplate("TRUE_FALSE",
+                        "Verdadeiro ou falso: remover no início de um array exige deslocar os elementos seguintes.",
+                        List.of("Verdadeiro", "Falso"),
+                        "A",
+                        "Correto: o custo vem do deslocamento para manter contiguidade.",
+                        "Arrays preservam posições contíguas; remoções internas deslocam elementos.");
+            };
+            case "pilhas" -> switch (variant) {
+                case 0 -> new GeneratedTemplate("TRACE_OUTPUT",
+                        "Pilha: push(" + a + "), push(" + b + "), pop(), push(" + c + "). Qual é o topo?",
+                        List.of(String.valueOf(c), String.valueOf(a), String.valueOf(b), "pilha vazia"),
+                        "A",
+                        "Correto: LIFO remove " + b + " e o último push vira topo.",
+                        "Em pilha, observe sempre o último elemento inserido que ainda não saiu.");
+                case 1 -> new GeneratedTemplate("TRACE_OUTPUT",
+                        "Fila: enqueue(" + a + "), enqueue(" + b + "), dequeue(), enqueue(" + c + "). Quem está na frente?",
+                        List.of(String.valueOf(b), String.valueOf(c), String.valueOf(a), "fila vazia"),
+                        "A",
+                        "Correto: FIFO remove o primeiro, então " + b + " assume a frente.",
+                        "Em fila, remoção acontece pela frente e inserção pelo fim.");
+                default -> new GeneratedTemplate("TRUE_FALSE",
+                        "Verdadeiro ou falso: pilha e fila usam a mesma ordem de remoção.",
+                        List.of("Verdadeiro", "Falso"),
+                        "B",
+                        "Correto: pilha é LIFO e fila é FIFO.",
+                        "Compare topo da pilha com frente da fila.");
+            };
+            case "ll" -> new GeneratedTemplate("TRACE_OUTPUT",
+                    "Lista ligada: A aponta para B e B aponta para C. Ao inserir X entre A e B, qual atualização é necessária?",
+                    List.of("A.next=X e X.next=B", "B.next=A e X.next=C", "C.next=X apenas", "A.next=C e B.next=X"),
+                    "A",
+                    "Correto: a inserção intermediária preserva o encadeamento anterior.",
+                    "Pense nos ponteiros que chegam e saem do novo nó.");
+            case "bst" -> new GeneratedTemplate("TRACE_OUTPUT",
+                    "BST: insira " + b + " como raiz, depois " + a + " e " + c + ". Onde ficam os novos nós?",
+                    List.of(a + " à esquerda e " + c + " à direita", a + " à direita e " + c + " à esquerda", "ambos à esquerda", "ambos à direita"),
+                    "A",
+                    "Correto: menores que a raiz seguem à esquerda; maiores, à direita.",
+                    "Compare cada valor com a raiz antes de escolher o ramo.");
+            case "hash" -> new GeneratedTemplate("TRACE_OUTPUT",
+                    "Tabela hash com 5 baldes e hash(x)=x%5. Insira " + a + " e " + (a + 5) + ". O que acontece?",
+                    List.of("colisão no mesmo balde", "baldes diferentes sem colisão", "remoção automática", "a tabela fica vazia"),
+                    "A",
+                    "Correto: números separados por 5 têm mesmo resto módulo 5.",
+                    "Calcule o resto da divisão por 5 para cada valor.");
+            case "grafos" -> new GeneratedTemplate("MULTIPLE_CHOICE",
+                    "Em BFS a partir de A, com arestas A-B, A-C e B-D, qual ordem é compatível?",
+                    List.of("A, B, C, D", "A, D, C, B", "D, B, C, A", "B, A, D, C"),
+                    "A",
+                    "Correto: BFS visita primeiro os vizinhos imediatos de A.",
+                    "Use uma fila para manter a fronteira de exploração em largura.");
+            default -> null;
+        };
+    }
+
     private GeneratedExerciseDto toGeneratedExerciseDto(GeneratedExercise exercise) {
         return GeneratedExerciseDto.builder()
                 .id(exercise.getGeneratedId())
@@ -669,27 +780,41 @@ public class ProgressService {
 
     private List<SimulationMission> missionsForTopic(String topicId) {
         return switch (topicId) {
-            case "arrays" -> List.of(new SimulationMission("arrays-map-3", "arrays", "ARRAY", "Mapa contíguo",
+            case "arrays" -> List.of(new SimulationMission("arrays-map-3", "arrays", "ARRAY", "DESAFIO", "Mapa contíguo",
                     "Insira pelo menos três valores e faça uma busca antes de validar.",
+                    "Visualizar contiguidade, índice e deslocamento em operações de array.",
+                    "Construa uma sequência de três posições e confirme que a busca encontra um valor presente.",
                     List.of("inserir", "inserir", "inserir", "buscar"), "values.length >= 3", 18));
             case "pilhas" -> List.of(
-                    new SimulationMission("stack-two-pop", "pilhas", "STACK", "Topo da clareira",
+                    new SimulationMission("stack-two-pop", "pilhas", "STACK", "GUIADO", "Topo da clareira",
                             "Empilhe ao menos dois valores e observe o topo antes de remover.",
+                            "Fixar LIFO: topo muda a cada push/pop.",
+                            "Monte uma pilha com dois marcos e remova o topo mantendo um item restante.",
                             List.of("push", "push", "pop"), "values.length >= 1", 16),
-                    new SimulationMission("queue-three-front", "pilhas", "QUEUE", "Fila da expedição",
+                    new SimulationMission("queue-three-front", "pilhas", "QUEUE", "GUIADO", "Fila da expedição",
                             "Enfileire três valores e mantenha a frente visível.",
+                            "Fixar FIFO: frente e fim têm papéis diferentes.",
+                            "Crie uma fila com três marcos e observe quem permanece na frente.",
                             List.of("enqueue", "enqueue", "enqueue"), "values.length >= 3", 16));
-            case "ll" -> List.of(new SimulationMission("linked-chain-3", "ll", "LINKED_LIST", "Corrente de nós",
+            case "ll" -> List.of(new SimulationMission("linked-chain-3", "ll", "LINKED_LIST", "DESAFIO", "Corrente de nós",
                     "Monte uma lista com ao menos três nós encadeados.",
+                    "Conectar nós por referências em vez de depender de memória contígua.",
+                    "Crie uma corrente com três nós e valide o encadeamento visual.",
                     List.of("inserir", "inserir", "inserir"), "values.length >= 3", 18));
-            case "bst" -> List.of(new SimulationMission("bst-branching", "bst", "BST", "Raiz e dois ramos",
+            case "bst" -> List.of(new SimulationMission("bst-branching", "bst", "BST", "DESAFIO", "Raiz e dois ramos",
                     "Insira ao menos três valores para formar raiz, ramo esquerdo e ramo direito.",
+                    "Aplicar comparações sucessivas para preservar o invariante da árvore.",
+                    "Escolha uma raiz, depois adicione um valor menor e um maior.",
                     List.of("inserir raiz", "inserir menor", "inserir maior"), "has lower and higher than root", 20));
-            case "hash" -> List.of(new SimulationMission("hash-collision", "hash", "HASH_TABLE", "Colisão controlada",
+            case "hash" -> List.of(new SimulationMission("hash-collision", "hash", "HASH_TABLE", "DESAFIO", "Colisão controlada",
                     "Crie uma colisão inserindo dois valores que caiam no mesmo balde módulo 5.",
+                    "Entender colisão como consequência natural de mapear muitas chaves para poucos baldes.",
+                    "Insira dois valores com o mesmo resto na divisão por 5.",
                     List.of("inserir", "inserir", "observar colisão"), "two values share mod 5", 20));
-            case "grafos" -> List.of(new SimulationMission("graph-path-4", "grafos", "GRAPH", "Trilha conectada",
+            case "grafos" -> List.of(new SimulationMission("graph-path-4", "grafos", "GRAPH", "DESAFIO", "Trilha conectada",
                     "Monte um grafo com quatro nós e ao menos três arestas.",
+                    "Representar relações por arestas e preparar percurso em largura/profundidade.",
+                    "Construa quatro nós conectados por pelo menos três arestas.",
                     List.of("inserir nós", "conectar arestas", "percorrer"), "values.length >= 4 && edges.length >= 3", 22));
             default -> List.of();
         };
@@ -746,8 +871,11 @@ public class ProgressService {
             String id,
             String topicId,
             String simulatorType,
+            String mode,
             String title,
             String instructions,
+            String didacticFocus,
+            String challengePrompt,
             List<String> requiredActions,
             String successCriteria,
             int xp
@@ -757,8 +885,11 @@ public class ProgressService {
                     .id(id)
                     .topicId(topicId)
                     .simulatorType(simulatorType)
+                    .mode(mode)
                     .title(title)
                     .instructions(instructions)
+                    .didacticFocus(didacticFocus)
+                    .challengePrompt(challengePrompt)
                     .requiredActions(requiredActions)
                     .successCriteria(successCriteria)
                     .xp(xp)

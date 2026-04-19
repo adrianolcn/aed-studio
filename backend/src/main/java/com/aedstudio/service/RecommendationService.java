@@ -34,15 +34,19 @@ public class RecommendationService {
                         .title(t.getTitle())
                         .trackId(t.getTrackId())
                         .category("NEXT_STEP")
+                        .recommendationType("AVANCAR")
                         .action("explorar")
                         .priority(90 - t.getOrderIndex())
                         .confidence("AVAILABLE".equals(t.getState()) ? 0.86 : 0.78)
                         .reason("Você já concluiu os pré-requisitos e este território ainda não foi finalizado.")
+                        .evidence("Estado atual: " + t.getState() + "; avanço no tópico: " + t.getBestScorePercent() + "%.")
+                        .suggestedActivity("Abra o tópico, rode o simulador e responda ao primeiro exercício obrigatório.")
                         .build())
                 .toList();
 
         List<RecommendationDto> weaknessReview = topicAnalytics.stream()
                 .filter(t -> t.getAttempts() >= 2 && t.getAccuracyPercent() < TopicCatalog.COMPLETION_THRESHOLD_PERCENT
+                        || t.getCodeSubmissions() >= 2 && t.getCodeSuccessPercent() < TopicCatalog.COMPLETION_THRESHOLD_PERCENT
                         || ("VISITED".equals(t.getState()) && t.getAttempts() == 0))
                 .sorted(Comparator.comparingDouble(this::riskScore).reversed())
                 .limit(3)
@@ -51,12 +55,23 @@ public class RecommendationService {
                         .title(t.getTitle())
                         .trackId(t.getTrackId())
                         .category("REVIEW")
+                        .recommendationType(t.getAttempts() >= 2 || t.getCodeSubmissions() >= 2 ? "REFORCAR_BASE" : "REVISAR")
                         .action("revisar")
                         .priority((int) Math.round(riskScore(t)))
                         .confidence(Math.min(0.94, 0.55 + riskScore(t) / 200.0))
-                        .reason(t.getAttempts() >= 2
+                        .reason(t.getCodeSubmissions() >= 2 && t.getCodeSuccessPercent() < TopicCatalog.COMPLETION_THRESHOLD_PERCENT
+                                ? "Seu desempenho nos desafios de código deste tópico ficou instável; vale reforçar antes de avançar."
+                                : t.getAttempts() >= 2
                                 ? "Seu desempenho neste tópico ficou abaixo de 70%; vale revisar antes de avançar."
                                 : "Você visitou este tópico, mas ainda não registrou prática.")
+                        .evidence("Tentativas: " + t.getAttempts() + "; acerto: " + t.getAccuracyPercent()
+                                + "%; código: " + t.getCodeSuccessPercent() + "% em " + t.getCodeSubmissions()
+                                + " submissões; risco: " + t.getRiskLevel() + ".")
+                        .suggestedActivity(t.getCodeSubmissions() >= 2
+                                ? "Reabra o desafio de código, leia os cenários que falharam e envie uma solução menor."
+                                : t.getAttempts() >= 2
+                                ? "Resolva uma variação dinâmica guiada e valide uma missão do simulador."
+                                : "Faça uma tentativa curta para transformar leitura em prática.")
                         .build())
                 .toList();
 
@@ -70,10 +85,13 @@ public class RecommendationService {
                         .title(t.getTitle())
                         .trackId(t.getTrackId())
                         .category("SPACED_REVIEW")
+                        .recommendationType("REVISAR")
                         .action("revisar por espaçamento")
                         .priority(76)
                         .confidence(0.72)
                         .reason("Este marco foi concluído, mas está há mais de 7 dias sem contato; uma revisão curta ajuda retenção.")
+                        .evidence("Última tentativa: " + t.getLastAttemptAt() + ".")
+                        .suggestedActivity("Reabra o tópico e faça uma questão dinâmica de dificuldade 2.")
                         .build())
                 .toList();
 
@@ -91,10 +109,13 @@ public class RecommendationService {
                         .title(t.getName())
                         .trackId(t.getTrackId())
                         .category("TRAIL_FOCUS")
+                        .recommendationType("AVANCAR")
                         .action("continuar trilha")
                         .priority(70)
                         .confidence(t.getAttempts() > 0 ? 0.74 : 0.58)
                         .reason("Esta trilha tem avanço parcial e ajuda a manter continuidade na jornada.")
+                        .evidence("Progresso da trilha: " + t.getProgressPercent() + "%; acerto: " + t.getAccuracyPercent() + "%.")
+                        .suggestedActivity("Escolha o primeiro território disponível dessa trilha e conclua um marco prático.")
                         .build())
                 .toList();
 
@@ -113,8 +134,10 @@ public class RecommendationService {
     private double riskScore(TopicAnalyticsDto topic) {
         double accuracyRisk = topic.getAttempts() == 0 ? 45 : Math.max(0, 100 - topic.getAccuracyPercent());
         double repeatedRisk = Math.min(25, topic.getAttempts() * 8);
+        double codeRisk = topic.getCodeSubmissions() == 0 ? 0 :
+                Math.max(0, 100 - topic.getCodeSuccessPercent()) * 0.35 + Math.min(20, topic.getCodeSubmissions() * 4);
         double recencyRisk = topic.getLastAttemptAt() == null ? 12 :
                 Math.min(20, java.time.Duration.between(topic.getLastAttemptAt(), LocalDateTime.now()).toDays() * 2.0);
-        return accuracyRisk + repeatedRisk + recencyRisk;
+        return accuracyRisk + repeatedRisk + codeRisk + recencyRisk;
     }
 }

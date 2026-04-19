@@ -16,7 +16,15 @@ public class CodeChallengeDto {
     private String topicId;
     private String title;
     private String prompt;
+    private String functionName;
+    private String signature;
+    private String returnType;
+    private List<String> examples;
     private String starterCode;
     private List<String> expectedConcepts;
+    private String conceptualHint;
+    private String structuralHint;
+    private String pseudoSkeleton;
+    private Integer difficulty;
     private Integer xp;
 }

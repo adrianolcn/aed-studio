@@ -15,8 +15,11 @@ public class SimulationMissionDto {
     private String id;
     private String topicId;
     private String simulatorType;
+    private String mode;
     private String title;
     private String instructions;
+    private String didacticFocus;
+    private String challengePrompt;
     private List<String> requiredActions;
     private String successCriteria;
     private Integer xp;

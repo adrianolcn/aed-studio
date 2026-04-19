@@ -287,6 +287,17 @@ html, body {
 .mission-card.done { border-color: var(--green); }
 .code-sandbox-panel { margin: 12px 0 18px; background: var(--bg1); border: 1px solid var(--border); border-left: 3px solid var(--amber); border-radius: 8px; padding: 14px; }
 .code-sandbox-panel textarea { width: 100%; min-height: 150px; background: var(--bg0); color: var(--text0); border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.5; resize: vertical; }
+.code-contract { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr) minmax(180px, .45fr); align-items: stretch; margin: 10px 0; }
+.code-contract pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; background: var(--bg0); border: 1px solid var(--border); border-radius: 8px; padding: 10px; color: var(--text0); font-size: 12px; }
+.code-history { margin-top: 10px; display: grid; gap: 8px; }
+.code-history-row { display: grid; grid-template-columns: 90px 1fr auto; gap: 8px; align-items: center; padding: 8px 10px; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; color: var(--text1); font-size: 12px; }
+.code-status-success { color: var(--green); }
+.code-status-failure { color: var(--amber); }
+.code-status-error { color: var(--coral); }
+@media (max-width: 720px) {
+  .code-contract { grid-template-columns: 1fr; }
+  .code-history-row { grid-template-columns: 1fr; align-items: start; }
+}
 .xp-history { display: flex; align-items: end; gap: 5px; min-height: 58px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; overflow-x: auto; }
 .xp-bar { min-width: 18px; background: linear-gradient(180deg, var(--green), var(--accent)); border-radius: 4px 4px 0 0; opacity: .9; }
 
@@ -3549,8 +3560,23 @@ function showSyncToast(msg) {
 
 /* ── VISITED + PROGRESS ── */
 const visitedTopics = new Set();
+const learningPanelRenderSeq = { exercise: {}, code: {} };
 
-function nav(el, pageId, pathStr) {
+function nextLearningPanelRender(kind, pageId) {
+  const next = (learningPanelRenderSeq[kind][pageId] || 0) + 1;
+  learningPanelRenderSeq[kind][pageId] = next;
+  return next;
+}
+
+function isLatestLearningPanelRender(kind, pageId, seq) {
+  return learningPanelRenderSeq[kind][pageId] === seq;
+}
+
+function removeLearningPanels(page, selector) {
+  page.querySelectorAll(selector).forEach(panel => panel.remove());
+}
+
+async function nav(el, pageId, pathStr) {
   if(isTrackableTopic(pageId) && serverProgress.topicStates?.[pageId]?.state === 'LOCKED') {
     showLockToast('Complete os pré-requisitos deste tópico antes de avançar.');
     return;
@@ -3574,13 +3600,19 @@ function nav(el, pageId, pathStr) {
   document.getElementById('sb-topic').textContent=pathStr;
   addTab(pageId,pathStr);
   if(isTrackableTopic(pageId)){
-    syncVisit(pageId);
+    await syncVisit(pageId);
   }
   updateProgress();
   updateIconStates();
   // Fecha drawer em mobile ao navegar
   if (window.innerWidth <= 768) closeSidebar();
-  setTimeout(()=>initPage(pageId),80);
+  setTimeout(()=>{
+    initPage(pageId);
+    renderExercisePanel(pageId);
+    renderSimulatorPanel(pageId);
+    renderDynamicExercisePanel(pageId);
+    renderCodeSandboxPanel(pageId);
+  },80);
 }
 
 function paradigmsUnlocked() {
@@ -3664,8 +3696,15 @@ function getActivePageId() {
   return active?.id?.replace('page-','') || 'home';
 }
 
-function applyProgress(progress) {
+function insertLearningPanel(page, panel) {
+  const firstSec = page.querySelector('.sec');
+  if (firstSec?.parentNode) firstSec.parentNode.insertBefore(panel, firstSec);
+  else page.appendChild(panel);
+}
+
+function applyProgress(progress, options = {}) {
   if (!progress) return;
+  const rerenderLearningPanels = options.rerenderLearningPanels !== false;
   serverProgress = {
     ...serverProgress,
     ...progress,
@@ -3681,17 +3720,23 @@ function applyProgress(progress) {
   updateProgress();
   updateIconStates();
   renderDashboard();
-  renderExercisePanel(getActivePageId());
-  renderSimulatorPanel(getActivePageId());
-  renderDynamicExercisePanel(getActivePageId());
-  renderCodeSandboxPanel(getActivePageId());
+  if (rerenderLearningPanels) {
+    renderExercisePanel(getActivePageId());
+    renderSimulatorPanel(getActivePageId());
+    renderDynamicExercisePanel(getActivePageId());
+    renderCodeSandboxPanel(getActivePageId());
+  }
   queueEducationSignalRefresh();
 }
 
 async function syncVisit(pageId) {
-  const progress = await AedApi.recordVisit(pageId);
-  if (progress) applyProgress(progress);
-  else showSyncToast('Não foi possível salvar esta visita agora. Verifique sua conexão.');
+  try {
+    const progress = await AedApi.recordVisit(pageId);
+    if (progress) applyProgress(progress);
+    else showSyncToast('Não foi possível salvar esta visita agora. Verifique sua conexão.');
+  } catch (error) {
+    showSyncToast('Não foi possível salvar esta visita agora. Verifique sua conexão.');
+  }
 }
 
 function getQuizEventKey(el) {
@@ -3753,14 +3798,17 @@ function renderDashboard() {
 
 async function renderExercisePanel(pageId) {
   if(!isTrackableTopic(pageId)) return;
+  const seq = nextLearningPanelRender('exercise', pageId);
   const page=document.getElementById('page-'+pageId);
   if(!page) return;
-  page.querySelector('.exercise-panel')?.remove();
+  removeLearningPanels(page, '.exercise-panel');
   const state=serverProgress.topicStates?.[pageId]?.state;
   if(state === 'LOCKED' || state === 'COMPLETED') return;
 
   const exercises=await AedApi.getExercises(pageId);
+  if (!isLatestLearningPanelRender('exercise', pageId, seq)) return;
   if(!exercises?.length) return;
+  removeLearningPanels(page, '.exercise-panel');
   const ex=exercises[0];
   const panel=document.createElement('div');
   panel.className='exercise-panel';
@@ -3771,9 +3819,7 @@ async function renderExercisePanel(pageId) {
       ${(ex.options||[]).map((option,idx)=>`<button class="exercise-option" data-answer="${String.fromCharCode(65+idx)}">${String.fromCharCode(65+idx)}) ${option}</button>`).join('')}
     </div>
     <div class="exercise-feedback"></div>`;
-  const firstSec=page.querySelector('.sec');
-  if(firstSec) page.insertBefore(panel, firstSec);
-  else page.appendChild(panel);
+  insertLearningPanel(page, panel);
   panel.querySelectorAll('.exercise-option').forEach(btn=>{
     btn.addEventListener('click', async ()=>{
       panel.querySelectorAll('.exercise-option').forEach(b=>b.disabled=true);
@@ -3819,11 +3865,13 @@ function renderRecommendationCard(rec, className = '') {
   if (!rec) return '<div class="expedition-copy">Conclua uma atividade para receber uma rota mais precisa.</div>';
   const open = rec.topicId ? `<button class="btn" onclick="nav(null,'${rec.topicId}','${serverProgress.topicStates?.[rec.topicId]?.path || rec.topicId}')">abrir</button>` : '';
   return `<div class="recommendation-item ${className}">
-    <div class="meta">${rec.category || 'rota'} · confiança ${Math.round((rec.confidence || 0) * 100)}%</div>
+    <div class="meta">${rec.recommendationType || rec.category || 'rota'} · confiança ${Math.round((rec.confidence || 0) * 100)}%</div>
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
       <div>
         <div class="expedition-title">${rec.title}</div>
         <div class="expedition-copy">${rec.reason}</div>
+        ${rec.evidence ? `<div class="expedition-copy"><strong>evidência:</strong> ${rec.evidence}</div>` : ''}
+        ${rec.suggestedActivity ? `<div class="expedition-copy"><strong>próxima ação:</strong> ${rec.suggestedActivity}</div>` : ''}
       </div>
       ${open}
     </div>
@@ -3846,8 +3894,12 @@ function renderAnalyticsOverview() {
     const maxXp = Math.max(1, ...xpHistoryState.map(p => p.xp || 0));
     const bars = xpHistoryState.slice(-14).map(p => `<div class="xp-bar" title="${p.date}: ${p.xp} XP" style="height:${Math.max(6, Math.round((p.xp || 0) * 52 / maxXp))}px"></div>`).join('');
     attention.innerHTML = items.length
-      ? items.map(t => `<div class="recommendation-item review"><div class="meta">ponto de atenção · ${t.accuracyPercent}%</div><div class="expedition-title">${t.title}</div><div class="expedition-copy">${t.insight}</div></div>`).join('')
+      ? items.map(t => `<div class="recommendation-item review"><div class="meta">risco ${t.riskLevel || 'médio'} · ${t.trendLabel || 'sem tendência'} · ${t.accuracyPercent}%</div><div class="expedition-title">${t.title}</div><div class="expedition-copy">${t.insight}</div></div>`).join('')
       : '<div class="expedition-copy">Nenhum ponto crítico detectado até agora.</div>';
+    const recovery = [...(a.improvingTopics || []), ...(a.regressingTopics || [])].slice(0, 3);
+    if (recovery.length) {
+      attention.innerHTML += recovery.map(t => `<div class="recommendation-item"><div class="meta">${t.improving ? 'em recuperação' : 'monitorar'} · ${t.trendLabel}</div><div class="expedition-title">${t.title}</div><div class="expedition-copy">${t.insight}</div></div>`).join('');
+    }
     attention.innerHTML += `<div class="mission-card"><div class="meta">histórico de XP</div><div class="xp-history">${bars || '<span class="expedition-copy">Sem XP registrado ainda.</span>'}</div></div>`;
   }
 }
@@ -3871,7 +3923,7 @@ function renderSimulatorPanel(pageId) {
   const configs = SIMULATOR_CONFIGS[pageId];
   const page = document.getElementById('page-' + pageId);
   if (!page || !configs) return;
-  page.querySelector('.simulator-panel')?.remove();
+  removeLearningPanels(page, '.simulator-panel');
   const state = serverProgress.topicStates?.[pageId]?.state;
   if (state === 'LOCKED') return;
 
@@ -3883,9 +3935,7 @@ function renderSimulatorPanel(pageId) {
     <div class="expedition-copy">As operações são locais para visualização, e os marcos de aprendizagem são registrados no servidor.</div>
     ${configs.length > 1 ? `<div class="simulator-toolbar">${configs.map((c,i)=>`<button data-sim-tab="${i}">${c.title}</button>`).join('')}</div>` : ''}
     <div class="simulator-host"></div>`;
-  const firstSec = page.querySelector('.sec');
-  if (firstSec) page.insertBefore(panel, firstSec);
-  else page.appendChild(panel);
+  insertLearningPanel(page, panel);
 
   const renderAt = index => {
     panel.dataset.simIndex = index;
@@ -4067,9 +4117,12 @@ async function loadSimulatorMissions(host, config, state) {
   }
   list.innerHTML = missions.map(m => `
     <div class="mission-card ${m.completed ? 'done' : ''}">
-      <div class="expedition-kicker">${m.completed ? 'validada' : 'missão'} · ${m.xp} XP</div>
+      <div class="expedition-kicker">${m.completed ? 'validada' : (m.mode || 'missão')} · ${m.xp} XP</div>
       <div class="expedition-title">${m.title}</div>
       <div class="expedition-copy">${m.instructions}</div>
+      ${m.didacticFocus ? `<div class="expedition-copy"><strong>foco:</strong> ${m.didacticFocus}</div>` : ''}
+      ${m.challengePrompt ? `<div class="expedition-copy"><strong>desafio:</strong> ${m.challengePrompt}</div>` : ''}
+      ${m.successCriteria ? `<div class="meta">critério · ${m.successCriteria}</div>` : ''}
       <button class="btn" data-mission-submit="${m.id}" ${m.completed ? 'disabled' : ''}>validar missão</button>
       <div class="exercise-feedback"></div>
     </div>`).join('');
@@ -4091,7 +4144,7 @@ async function renderDynamicExercisePanel(pageId) {
   if (!isTrackableTopic(pageId)) return;
   const page = document.getElementById('page-' + pageId);
   if (!page) return;
-  page.querySelector('.dynamic-exercise-panel')?.remove();
+  removeLearningPanels(page, '.dynamic-exercise-panel');
   const state = serverProgress.topicStates?.[pageId]?.state;
   if (state === 'LOCKED' || state === 'COMPLETED') return;
   const panel = document.createElement('div');
@@ -4105,9 +4158,7 @@ async function renderDynamicExercisePanel(pageId) {
       <button class="dynamic-generate">gerar exercício</button>
     </div>
     <div class="dynamic-host"></div>`;
-  const firstSec = page.querySelector('.sec');
-  if(firstSec) page.insertBefore(panel, firstSec);
-  else page.appendChild(panel);
+  insertLearningPanel(page, panel);
   panel.querySelector('.dynamic-generate').addEventListener('click', async () => {
     const difficulty = Number(panel.querySelector('.dynamic-difficulty').value || 1);
     const exercise = await AedApi.generateExercise(pageId, difficulty);
@@ -4146,31 +4197,90 @@ function renderGeneratedExercise(host, exercise) {
   }));
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function renderCodeHistory(submissions = []) {
+  if (!submissions.length) {
+    return '<div class="expedition-copy">Nenhuma submissão registrada ainda para este desafio.</div>';
+  }
+  return submissions.slice(0, 5).map(sub => {
+    const status = String(sub.status || 'PENDING').toLowerCase();
+    const label = sub.status === 'SUCCESS' ? 'sucesso' : sub.status === 'ERROR' ? 'erro' : 'ajustar';
+    const when = sub.createdAt ? new Date(sub.createdAt).toLocaleString('pt-BR') : 'agora';
+    return `<div class="code-history-row">
+      <strong class="code-status-${status}">${label}${sub.best ? ' · melhor' : ''}</strong>
+      <span>${sub.passedTests || 0}/${sub.totalTests || 0} cenários · ${sub.executionTimeMs || 0} ms</span>
+      <span class="meta">${when}</span>
+    </div>`;
+  }).join('');
+}
+
+async function refreshCodeHistory(panel, challengeId) {
+  const host = panel.querySelector('.code-history');
+  if (!host) return;
+  try {
+    const submissions = await AedApi.getCodeSubmissions({ exerciseId: challengeId });
+    host.innerHTML = renderCodeHistory(submissions || []);
+  } catch (error) {
+    host.innerHTML = '<div class="exercise-feedback" style="color:var(--coral)">Não foi possível carregar o histórico agora.</div>';
+  }
+}
+
 async function renderCodeSandboxPanel(pageId) {
   if (!isTrackableTopic(pageId)) return;
+  const seq = nextLearningPanelRender('code', pageId);
   const page = document.getElementById('page-' + pageId);
   if (!page) return;
-  page.querySelector('.code-sandbox-panel')?.remove();
+  removeLearningPanels(page, '.code-sandbox-panel');
   const state = serverProgress.topicStates?.[pageId]?.state;
   if (state === 'LOCKED' || state === 'COMPLETED') return;
   const challenges = await AedApi.getCodeChallenges(pageId);
+  if (!isLatestLearningPanelRender('code', pageId, seq)) return;
   if (!challenges?.length) return;
+  removeLearningPanels(page, '.code-sandbox-panel');
   const challenge = challenges[0];
+  const examples = (challenge.examples || []).map(example => `<div>${escapeHtml(example)}</div>`).join('');
   const panel = document.createElement('div');
   panel.className = 'code-sandbox-panel';
   panel.innerHTML = `
     <div class="expedition-kicker">// sandbox de código</div>
     <div class="expedition-title">${challenge.title}</div>
     <div class="expedition-copy">${challenge.prompt}</div>
+    <div class="code-contract">
+      <pre>${escapeHtml((challenge.returnType || 'int') + ' ' + (challenge.signature || 'solve(int[] values)'))}</pre>
+      <div class="mission-card">
+        <div class="meta">exemplos</div>
+        <div class="expedition-copy">${examples || 'Os cenários reais ficam no judge.'}</div>
+      </div>
+    </div>
+    <div class="mission-card">
+      <div class="meta">dica conceitual</div>
+      <div class="expedition-copy">${challenge.conceptualHint || 'Preserve o contrato do método e pense nos casos de borda.'}</div>
+      <details>
+        <summary class="expedition-copy">ver dica estrutural e pseudoesqueleto</summary>
+        <div class="expedition-copy">${challenge.structuralHint || ''}</div>
+        <pre style="white-space:pre-wrap;color:var(--text1);font-size:12px">${challenge.pseudoSkeleton || ''}</pre>
+      </details>
+    </div>
     <textarea spellcheck="false">${challenge.starterCode || ''}</textarea>
     <div class="simulator-toolbar">
       <button class="code-run">executar no sandbox</button>
-      <span class="expedition-copy">Ambiente isolado com política restritiva e tempo limite.</span>
+      <span class="expedition-copy">Ambiente isolado · dificuldade ${challenge.difficulty || 1} · ${challenge.xp || 0} XP.</span>
     </div>
-    <div class="exercise-feedback"></div>`;
-  const firstSec = page.querySelector('.sec');
-  if(firstSec) page.insertBefore(panel, firstSec);
-  else page.appendChild(panel);
+    <div class="exercise-feedback"></div>
+    <div class="mission-card">
+      <div class="meta">histórico de submissões</div>
+      <div class="code-history"><div class="expedition-copy">Carregando histórico...</div></div>
+    </div>`;
+  insertLearningPanel(page, panel);
+  refreshCodeHistory(panel, challenge.id);
   panel.querySelector('.code-run').addEventListener('click', async () => {
     const result = await AedApi.runCode(challenge.id, panel.querySelector('textarea').value);
     const fb = panel.querySelector('.exercise-feedback');
@@ -4179,9 +4289,17 @@ async function renderCodeSandboxPanel(pageId) {
       fb.style.color = 'var(--coral)';
       return;
     }
-    fb.textContent = result.feedback + (result.awarded ? ' +' + result.awarded + ' XP' : '');
+    const passed = result.passedChecks || [];
+    const failed = result.failedChecks || [];
+    fb.innerHTML = `
+      <div>${result.feedback}${result.awarded ? ' +' + result.awarded + ' XP' : ''}</div>
+      <div class="meta">${result.status || ''} · submissão #${result.submissionId || '-'} · ${result.executionTimeMs || 0} ms · ${result.passedCount || passed.length}/${result.totalChecks || (passed.length + failed.length)} cenários passaram</div>
+      ${passed.length ? `<div class="expedition-copy"><strong>passaram:</strong> ${passed.join(', ')}</div>` : ''}
+      ${failed.length ? `<div class="expedition-copy"><strong>ajustar:</strong> ${failed.join(', ')}</div>` : ''}
+      ${result.hint ? `<div class="expedition-copy"><strong>dica:</strong> ${result.hint}</div>` : ''}`;
     fb.style.color = result.accepted ? 'var(--green)' : 'var(--coral)';
-    if (result.progress) applyProgress(result.progress);
+    if (result.progress) applyProgress(result.progress, { rerenderLearningPanels: false });
+    refreshCodeHistory(panel, challenge.id);
   });
 }
 

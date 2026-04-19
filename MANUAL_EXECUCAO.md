@@ -18,7 +18,7 @@ Navegador -> frontend/login.html -> API Spring Boot -> PostgreSQL
 Para desafios de código em produção:
 
 ```text
-API Spring Boot -> Docker -> container isolado -> resultado do desafio
+API Spring Boot -> judge -> Docker -> container isolado -> resultado + submissão persistida
 ```
 
 ## 2. Pré-Requisitos
@@ -241,6 +241,16 @@ docker run --rm --network none eclipse-temurin:17-jdk java -version
 
 O modo Docker roda cada tentativa de código em container isolado, sem rede e com limites de recurso.
 
+O judge aceita desafios com assinatura controlada. Hoje o front-end envia apenas o corpo da função, e o back-end monta a classe de execução com uma destas assinaturas:
+
+- `solve(int[] values)`
+- `solve(String input)`
+- `solve(int n)`
+- `solve(int[] values, int target)`
+- `solve(String[] values)`
+
+Cada execução salva uma submissão com status, total de testes, testes aprovados, tempo e data/hora. Esse histórico aparece no painel do desafio e também entra nos analytics.
+
 ## 10. Rodar Testes
 
 Back-end:
@@ -265,6 +275,28 @@ npm run test:frontend
 ```
 
 Observação: o teste visual com Chrome pode ser pulado se o ambiente bloquear execução headless pelo Node. Isso é esperado em alguns sandboxes. Para validar manualmente, rode Chrome headless fora do sandbox ou teste pelo navegador.
+
+E2E real com Playwright:
+
+```powershell
+npm install
+npm run playwright:install
+npm run test:e2e
+```
+
+Esse teste sobe automaticamente:
+
+- back-end em `http://127.0.0.1:8080` com perfil `e2e` e H2 em memória;
+- front-end em `http://127.0.0.1:5500`;
+- Chromium headless pelo Playwright.
+
+O cenário cobre cadastro/login, dashboard, tópico recomendado, simulador, exercício de código com falha e sucesso, histórico de submissões, progresso e analytics.
+
+Se o Playwright reclamar que o navegador não está instalado, rode:
+
+```powershell
+npx playwright install chromium
+```
 
 ## 11. URLs Úteis
 
@@ -379,14 +411,23 @@ Verifique:
 
 ```powershell
 docker --version
-docker pull eclipse-temurin:17-jdk
 docker run --rm --network none eclipse-temurin:17-jdk java -version
 ```
 
-Se Docker não estiver disponível, use temporariamente:
+Em desenvolvimento, você pode voltar temporariamente para:
 
 ```dotenv
 CODE_SANDBOX_MODE=local
+```
+
+Para uso público, prefira `docker`.
+
+### O E2E falha porque a porta 8080 ou 5500 já está em uso
+
+Feche processos antigos do back-end ou do servidor local e rode novamente:
+
+```powershell
+npm run test:e2e
 ```
 
 ### GitHub Actions falha em poucos segundos no job backend
@@ -426,6 +467,8 @@ Suba:
 - `GITHUB_RELEASE_NOTES.md`
 - `.env.example`
 - `package.json`
+- `package-lock.json`
+- `playwright.config.js`
 - `.github`, se quiser manter CI
 
 ## 15. Comandos Rápidos
