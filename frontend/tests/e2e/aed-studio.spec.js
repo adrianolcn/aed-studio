@@ -3,13 +3,21 @@ const { test, expect } = require('@playwright/test');
 const apiBase = 'http://127.0.0.1:8080';
 
 async function completeCurrentExercise(page, topicId) {
-  const option = page.locator('.page.active .exercise-panel .exercise-option[data-answer="B"]').first();
+  await openPracticeTopic(page, topicId);
+  const option = page.locator('#practice-required-host .exercise-option[data-answer="B"]').first();
   await expect(option).toBeVisible();
   await option.click();
   await expect.poll(
     () => page.evaluate(topicId => window.AedApi.getProgress().then(p => p.topicStates?.[topicId]?.state), topicId),
     { timeout: 20_000 }
   ).toBe('COMPLETED');
+}
+
+async function openPracticeTopic(page, topicId) {
+  await page.evaluate(() => window.nav(null, 'exercicios', 'extra/exercícios'));
+  await expect(page.locator('#page-exercicios.active')).toBeVisible();
+  await page.evaluate(topicId => window.renderPracticeWorkspace(topicId), topicId);
+  await expect(page.locator('#practice-topic-select')).toHaveValue(topicId);
 }
 
 async function openTopic(page, topicId, path) {
@@ -44,20 +52,22 @@ test('fluxo completo: login, dashboard, recomendação, simulador, código, prog
 
   await openTopic(page, 'arrays', 'algoritmos/estruturas-lineares/arrays');
   await expect(page.locator('.page.active .simulator-panel')).toBeVisible();
-  await page.locator('.page.active .simulator-panel .sim-value').fill('42');
-  await page.locator('.page.active .simulator-panel [data-sim-action="insert"]').click();
-  await expect(page.locator('.page.active .sim-stage')).toContainText('42');
+  await openPracticeTopic(page, 'arrays');
+  await expect(page.locator('#practice-simulator-host .simulator-host')).toBeVisible();
+  await page.locator('#practice-simulator-host .sim-value').fill('42');
+  await page.locator('#practice-simulator-host [data-sim-action="insert"]').click();
+  await expect(page.locator('#practice-simulator-host .sim-stage')).toContainText('42');
 
-  await expect(page.locator('.page.active .code-sandbox-panel')).toBeVisible();
-  const editor = page.locator('.page.active .code-sandbox-panel textarea');
+  await expect(page.locator('#practice-code-host textarea')).toBeVisible();
+  const editor = page.locator('#practice-code-host textarea');
   await editor.fill('return -1;');
-  await page.locator('.page.active .code-run').click();
-  await expect(page.locator('.page.active .code-sandbox-panel .exercise-feedback')).toContainText(/não passou|ajustar/i);
+  await page.locator('#practice-code-host .code-run').click();
+  await expect(page.locator('#practice-code-host .exercise-feedback')).toContainText(/não passou|ajustar/i);
 
   await editor.fill('for (int i = 0; i < values.length; i++) { if (values[i] == target) return i; } return -1;');
-  await page.locator('.page.active .code-run').click();
-  await expect(page.locator('.page.active .code-sandbox-panel .exercise-feedback')).toContainText(/Todos os 3 cenários/i);
-  await expect(page.locator('.page.active .code-history-row').first()).toContainText(/sucesso|melhor/i);
+  await page.locator('#practice-code-host .code-run').click();
+  await expect(page.locator('#practice-code-host .exercise-feedback')).toContainText(/Todos os 3 cenários/i);
+  await expect(page.locator('#practice-code-host .code-history-row').first()).toContainText(/sucesso|melhor/i);
 
   const analytics = await page.evaluate(() => window.AedApi.getAnalyticsOverview());
   expect(analytics.codeSubmissions).toBeGreaterThanOrEqual(2);
